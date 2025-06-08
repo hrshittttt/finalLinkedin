@@ -1,7 +1,7 @@
 export default function Left() {
   return (
     <div className="flex flex-col gap-2">
-      <div className="w-[225px] h-[225px] bg-linkedin-bg rounded-lg relative left-[174px] top-[20px] border-[0.5px] border-linkedin-border">
+      <div className="w-56 h-56 bg-linkedin-bg rounded-lg relative left-44 top-5 border border-linkedin-border">
         <div className="w-[225px] h-[58]">
           <img
             className="rounded-t-lg"
@@ -13,9 +13,9 @@ export default function Left() {
           ></img>
         </div>
       </div>
-      <div className="w-[225px] h-[75px] bg-linkedin-bg rounded-lg relative left-[174px] top-[20px] border-[0.5px] border-linkedin-border"></div>
-      <div className="w-[225px] h-[88px] bg-linkedin-bg rounded-lg relative left-[174px] top-[20px] border-[0.5px] border-linkedin-border"></div>
-      <div className="w-[225px] h-[84px] bg-linkedin-bg rounded-lg relative left-[174px] top-[20px] border-[0.5px] border-linkedin-border"></div>
+      <div className="w-56 h-20 bg-linkedin-bg rounded-lg relative left-44 top-5 border border-linkedin-border"></div>
+      <div className="w-56 h-24 bg-linkedin-bg rounded-lg relative left-44 top-5 border border-linkedin-border"></div>
+      <div className="w-56 h-20 bg-linkedin-bg rounded-lg relative left-44 top-5 border border-linkedin-border"></div>
     </div>
   );
 }
