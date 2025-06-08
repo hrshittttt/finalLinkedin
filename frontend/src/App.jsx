@@ -1,10 +1,5 @@
-import Header from "./Header";
-import Hero from "./Hero";
+import Login from "../components/Authentication/Login";
+
 export default function App() {
-  return (
-    <>
-      <Header />
-      <Hero />
-    </>
-  );
+  return <Login />;
 }
