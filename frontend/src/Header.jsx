@@ -6,11 +6,13 @@ export default function Header() {
       <nav className="flex flex-row justify-between bg-linkedin-bg text-linkedin-secondary-text p-2 border-b border-linkedin-border max-h-14">
         <div className="flex flex-row items-center gap-1 hover:text-white ml-10 sm:ml-40">
           {/* Icon and Search Bar */}
-          <img
-            src="./src/assets/LinkedIn Logo.png"
-            className="w-12 h-12"
-            alt="LinkedIn Logo"
-          />
+          <a href="#">
+            <img
+              src="./src/assets/LinkedinDarkShort.png"
+              className="w-12 h-12"
+              alt="LinkedIn Logo"
+            />
+          </a>
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-linkedin-secondary-text pl-1 pr-4">
               <FontAwesomeIcon icon="fa-solid fa-magnifying-glass" />

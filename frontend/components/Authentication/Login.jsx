@@ -1,8 +1,28 @@
+import { useState } from "react";
+
 export default function Login() {
+  const [mail, setMail] = useState("");
+  const [pass, setPass] = useState("");
+
+  const handleMailChange = (e) => setMail(e.target.value);
+  const handlePassChange = (e) => setPass(e.target.value);
+
+  const handleSubmit = (e) => {
+    e.preventDefault(); // ✅ Prevent page reload
+    console.log("Form submitted with:", { mail, pass });
+  };
+
   return (
     <>
+      <img
+        src="./components/Authentication/assets/LinkedinDarkFull.png"
+        className="max-w-28 max-h-7 relative left-4 top-4"
+      ></img>
       <div className="flex justify-center items-center min-h-screen">
-        <div className="w-full max-w-sm sm:h-[400px] shadow-sm shadow-slate-600 bg-linkedin-bg flex flex-col justify-center items-center border border-[0.5px] border-linkedin-border rounded-lg gap-4 p-4">
+        <form
+          onSubmit={handleSubmit}
+          className="w-full max-w-sm sm:h-[400px] shadow-sm shadow-slate-600 bg-linkedin-bg flex flex-col justify-center items-center border border-linkedin-border rounded-lg gap-4 p-4"
+        >
           <h1 className="w-full max-w-[304px] h-[44px] text-linkedin-text text-4xl">
             Sign in
           </h1>
@@ -13,8 +33,10 @@ export default function Login() {
               id="email"
               type="text"
               required
-              className="peer w-full h-[52px] pt-5 pl-3 bg-linkedin-bg text-linkedin-text text-lg border border-linkedin-border rounded-md placeholder-transparent focus:outline-none focus:ring-2 focus:ring-linkedin-blue"
+              value={mail}
+              onChange={handleMailChange}
               placeholder="Email or Phone Number"
+              className="peer w-full h-[52px] pt-5 pl-3 bg-linkedin-bg text-linkedin-text text-lg border border-linkedin-border rounded-md placeholder-transparent focus:outline-none focus:ring-2 focus:ring-linkedin-blue"
             />
             <label
               htmlFor="email"
@@ -32,8 +54,10 @@ export default function Login() {
               id="password"
               type="password"
               required
-              className="peer w-full h-[52px] pt-5 pl-3 bg-linkedin-bg text-linkedin-text text-lg border border-linkedin-border rounded-md placeholder-transparent focus:outline-none focus:ring-2 focus:ring-linkedin-blue"
+              value={pass}
+              onChange={handlePassChange}
               placeholder="Password"
+              className="peer w-full h-[52px] pt-5 pl-3 bg-linkedin-bg text-linkedin-text text-lg border border-linkedin-border rounded-md placeholder-transparent focus:outline-none focus:ring-2 focus:ring-linkedin-blue"
             />
             <label
               htmlFor="password"
@@ -51,13 +75,14 @@ export default function Login() {
           >
             Sign in
           </button>
+
           <span className="cursor-default text-linkedin-text">
             New to LinkedIn? Make an account{" "}
             <a className="text-linkedin-blue cursor-pointer underline" href="#">
               here
             </a>
           </span>
-        </div>
+        </form>
       </div>
     </>
   );
