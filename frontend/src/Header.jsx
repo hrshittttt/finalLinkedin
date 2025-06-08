@@ -3,18 +3,18 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 export default function Header() {
   return (
     <>
-      <nav className="flex flex-row justify-between bg-linkedin-bg text-linkedin-secondary-text p-2 border-b border-linkedin-border">
-        <div className="flex flex-row items-center gap-5 hover:text-white">
+      <nav className="flex flex-row justify-between bg-linkedin-bg text-linkedin-secondary-text p-2 border-b border-linkedin-border max-h-[53px]">
+        <div className="flex flex-row items-center gap-1 hover:text-white ml-40">
           {/* Icon and Search Bar */}
-          <img src="./src/assets/LinkedIn Logo.png" className="size-10"></img>
+          <img src="./src/assets/LinkedIn Logo.png" className="size-12"></img>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-linkedin-secondary-text">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-linkedin-secondary-text pl-1 pr-4">
               <FontAwesomeIcon icon="fa-solid fa-magnifying-glass" />
             </span>
             <input
               type="text"
               placeholder="Search"
-              className="bg-linkedin-card text-white placeholder-linkedin-secondary-text pl-10 pr-3 py-1 rounded-md outline-none focus:ring-2 focus:ring-linkedin-blue"
+              className="bg-gray-700 text-white placeholder-gray-400 pr-35 py-2 pl-9 rounded-md outline-none focus:ring-2 focus:ring-linkedin-blue"
             />
           </div>
         </div>
