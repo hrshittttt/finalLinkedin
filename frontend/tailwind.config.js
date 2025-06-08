@@ -14,6 +14,7 @@ export default {
         "linkedin-text": "#FFFFFF",
         "linkedin-secondary-text": "#C4C4C4",
         "linkedin-blue": "#0077B5",
+        "linkedin-hover-blue": "#00649B",
       },
     },
   },
