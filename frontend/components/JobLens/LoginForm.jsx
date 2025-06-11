@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
-export default function LoginForm() {
+export default function LinkedInForm() {
+  const [step, setStep] = useState(1);
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
   const [experiences, setExperiences] = useState("");
@@ -8,14 +10,11 @@ export default function LoginForm() {
   const [targetCompany, setTargetCompany] = useState("");
   const [resume, setResume] = useState(null);
   const [gitUrl, setGitURL] = useState("");
-
-  const handleNameChange = (e) => setName(e.target.value);
-  const handleLocationChange = (e) => setLocation(e.target.value);
-  const handleExperiencesChange = (e) => setExperiences(e.target.value);
-  const handleEducationChange = (e) => setEducation(e.target.value);
-  const handleTargetCompanyChange = (e) => setTargetCompany(e.target.value);
-  const handleResumeChange = (e) => setResume(e.target.files[0]);
-  const handleGitUrlChange = (e) => setGitURL(e.target.value);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedSkills, setSelectedSkills] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [errors, setErrors] = useState({});
+  const wrapperRef = useRef(null);
 
   const skills = [
     "JavaScript",
@@ -130,11 +129,6 @@ export default function LoginForm() {
     "Vercel",
   ];
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedSkills, setSelectedSkills] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const wrapperRef = useRef(null);
-
   const filteredSkills = skills.filter(
     (skill) =>
       skill.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -147,9 +141,13 @@ export default function LoginForm() {
     setShowSuggestions(false);
   };
 
+  const handleRemoveSkill = (skill) => {
+    setSelectedSkills(selectedSkills.filter((s) => s !== skill));
+  };
+
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+    function handleClickOutside(e) {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
         setShowSuggestions(false);
       }
     }
@@ -157,133 +155,276 @@ export default function LoginForm() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  function handleSubmit(e) {
+  const validateStep = () => {
+    const newErrors = {};
+    if (step === 1 && !name.trim()) newErrors.name = "Name is required";
+    if (step === 2 && !experiences.trim())
+      newErrors.experiences = "Experience is required";
+    if (step === 3 && selectedSkills.length === 0)
+      newErrors.skills = "Select at least one skill";
+    if (step === 4 && !location.trim())
+      newErrors.location = "Location is required";
+    if (step === 5 && !education.trim())
+      newErrors.education = "Education is required";
+    if (step === 6 && !targetCompany.trim())
+      newErrors.targetCompany = "Target company is required";
+    if (step === 7 && !resume) newErrors.resume = "Resume is required";
+    if (step === 8) {
+      const urlRegex =
+        /^(https?:\/\/)?(www\.)?github\.com\/[A-Za-z0-9_.-]+\/?$/;
+      if (!gitUrl.trim()) newErrors.gitUrl = "GitHub URL is required";
+      else if (!urlRegex.test(gitUrl))
+        newErrors.gitUrl = "Enter a valid GitHub URL";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleNext = () => {
+    if (validateStep()) setStep((s) => s + 1);
+  };
+
+  const handlePrev = () => {
+    setStep((s) => s - 1);
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Submitted:", {
+    if (!validateStep()) return;
+    console.log({
       name,
-      location,
       experiences,
+      selectedSkills,
+      location,
       education,
       targetCompany,
       resume,
       gitUrl,
-      selectedSkills,
     });
-  }
+  };
+
+  const inputClass =
+    "w-full h-10 py-3 pl-3 bg-linkedin-bg text-linkedin-text text-lg border border-linkedin-border rounded-md placeholder-transparent focus:outline-none focus:ring-2 focus:ring-linkedin-blue";
 
   return (
-    <div className="flex flex-col justify-center items-center min-h-screen px-4">
+    <div className="flex items-center justify-center min-h-screen bg-linkedin-bg px-4">
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col gap-5 border border-linkedin-border bg-linkedin-bg p-12 rounded-lg w-full max-w-xl"
+        className="w-full max-w-md bg-linkedin-bg border border-linkedin-border text-linkedin-text shadow-md rounded-xl p-6"
       >
-        <h1 className="text-center text-linkedin-text font-extrabold text-3xl">
-          Enter your information here
-        </h1>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={step}
+            initial={{ x: 100, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -100, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {step === 1 && (
+              <Step title="What's your full name?">
+                <input
+                  className={inputClass}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+                {errors.name && <ErrorText>{errors.name}</ErrorText>}
+              </Step>
+            )}
 
-        <input
-          type="text"
-          placeholder="Full Name*"
-          className="bg-linkedin-card border border-linkedin-border rounded-md px-4 py-2 text-linkedin-text placeholder:text-sm placeholder:font-bold"
-          required
-          onChange={handleNameChange}
-          value={name}
-        />
+            {step === 2 && (
+              <Step title="What's your experience?">
+                <input
+                  className={inputClass}
+                  value={experiences}
+                  onChange={(e) => setExperiences(e.target.value)}
+                />
+                {errors.experiences && (
+                  <ErrorText>{errors.experiences}</ErrorText>
+                )}
+              </Step>
+            )}
 
-        <input
-          type="text"
-          placeholder="Location"
-          className="bg-linkedin-card border border-linkedin-border rounded-md px-4 py-2 text-linkedin-text placeholder:text-sm placeholder:font-bold"
-          onChange={handleLocationChange}
-          value={location}
-        />
+            {step === 3 && (
+              <Step title="Select your skills">
+                <div ref={wrapperRef} className="relative">
+                  <input
+                    type="search"
+                    className={inputClass}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onFocus={() => setShowSuggestions(true)}
+                  />
+                  {showSuggestions && filteredSkills.length > 0 && (
+                    <ul className="absolute z-10 w-full bg-linkedin-bg border border-linkedin-border rounded mt-1 shadow max-h-40 overflow-y-auto">
+                      {filteredSkills.map((skill, idx) => (
+                        <li
+                          key={idx}
+                          className="px-4 py-2 text-linkedin-text hover:bg-linkedin-hover-blue cursor-pointer"
+                          onClick={() => handleSelect(skill)}
+                        >
+                          {skill}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                {errors.skills && <ErrorText>{errors.skills}</ErrorText>}
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {selectedSkills.map((skill, index) => (
+                    <span
+                      key={index}
+                      className="flex items-center gap-2 bg-gray-700 px-3 py-1 rounded-full text-sm"
+                    >
+                      {skill}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSkill(skill)}
+                        className="text-red-400"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </Step>
+            )}
 
-        <input
-          type="text"
-          placeholder="Experiences*"
-          className="bg-linkedin-card border border-linkedin-border rounded-md px-4 py-2 text-linkedin-text placeholder:text-sm placeholder:font-bold"
-          required
-          onChange={handleExperiencesChange}
-          value={experiences}
-        />
+            {step === 4 && (
+              <Step title="Where are you located?">
+                <input
+                  className={inputClass}
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                />
+                {errors.location && <ErrorText>{errors.location}</ErrorText>}
+              </Step>
+            )}
 
-        <input
-          type="text"
-          placeholder="Education"
-          className="bg-linkedin-card border border-linkedin-border rounded-md px-4 py-2 text-linkedin-text placeholder:text-sm placeholder:font-bold"
-          onChange={handleEducationChange}
-          value={education}
-        />
+            {step === 5 && (
+              <Step title="Your Education">
+                <input
+                  className={inputClass}
+                  value={education}
+                  onChange={(e) => setEducation(e.target.value)}
+                />
+                {errors.education && <ErrorText>{errors.education}</ErrorText>}
+              </Step>
+            )}
 
-        {/* Skills search input */}
-        <div ref={wrapperRef} className="relative">
-          <input
-            type="search"
-            placeholder="Skills*"
-            className="bg-linkedin-card border border-linkedin-border rounded-md px-4 py-2 text-linkedin-text placeholder:text-sm placeholder:font-bold w-full"
-            value={searchTerm}
-            onFocus={() => setShowSuggestions(true)}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          {showSuggestions && filteredSkills.length > 0 && (
-            <ul className="absolute z-10 w-full max-h-40 overflow-y-auto bg-linkedin-card border text-linkedin-secondary-text border-linkedin-border rounded mt-1 shadow">
-              {filteredSkills.map((skill, index) => (
-                <li
-                  key={index}
-                  className="px-4 py-2 hover:bg-linkedin-border cursor-pointer"
-                  onClick={() => handleSelect(skill)}
-                >
-                  {skill}
-                </li>
-              ))}
-            </ul>
+            {step === 6 && (
+              <Step title="Target Company">
+                <input
+                  className={inputClass}
+                  value={targetCompany}
+                  onChange={(e) => setTargetCompany(e.target.value)}
+                />
+                {errors.targetCompany && (
+                  <ErrorText>{errors.targetCompany}</ErrorText>
+                )}
+              </Step>
+            )}
+
+            {step === 7 && (
+              <Step title="Upload your resume">
+                <input
+                  type="file"
+                  className={inputClass}
+                  onChange={(e) => setResume(e.target.files[0])}
+                />
+                {errors.resume && <ErrorText>{errors.resume}</ErrorText>}
+              </Step>
+            )}
+
+            {step === 8 && (
+              <Step title="GitHub Profile URL">
+                <input
+                  type="url"
+                  className={inputClass}
+                  value={gitUrl}
+                  onChange={(e) => setGitURL(e.target.value)}
+                />
+                {errors.gitUrl && <ErrorText>{errors.gitUrl}</ErrorText>}
+              </Step>
+            )}
+
+            {step === 9 && (
+              <Step title="Summary before submit">
+                <ul className="text-sm space-y-2">
+                  <li>
+                    <strong>Name:</strong> {name}
+                  </li>
+                  <li>
+                    <strong>Experience:</strong> {experiences}
+                  </li>
+                  <li>
+                    <strong>Skills:</strong> {selectedSkills.join(", ")}
+                  </li>
+                  <li>
+                    <strong>Location:</strong> {location}
+                  </li>
+                  <li>
+                    <strong>Education:</strong> {education}
+                  </li>
+                  <li>
+                    <strong>Target Company:</strong> {targetCompany}
+                  </li>
+                  <li>
+                    <strong>GitHub:</strong> {gitUrl}
+                  </li>
+                  <li>
+                    <strong>Resume:</strong> {resume?.name}
+                  </li>
+                </ul>
+              </Step>
+            )}
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Navigation */}
+        <div className="flex justify-between items-center mt-6">
+          {step > 1 && (
+            <button
+              type="button"
+              className="bg-gray-600 px-4 py-2 rounded"
+              onClick={handlePrev}
+            >
+              Prev
+            </button>
+          )}
+          {step < 9 && (
+            <button
+              type="button"
+              className="bg-linkedin-blue text-white px-4 py-2 rounded hover:bg-linkedin-hover-blue"
+              onClick={handleNext}
+            >
+              Next
+            </button>
+          )}
+          {step === 9 && (
+            <button
+              type="submit"
+              className="bg-green-600 text-white px-4 py-2 rounded"
+            >
+              Submit
+            </button>
           )}
         </div>
 
-        {/* Selected Skills */}
-        {selectedSkills.length > 0 && (
-          <div className="w-full">
-            <div className="flex flex-wrap gap-2 w-full">
-              {selectedSkills.map((skill, index) => (
-                <span
-                  key={index}
-                  className="bg-linkedin-card border border-linkedin-border text-linkedin-secondary-text px-3 py-1 rounded-full text-sm max-w-full truncate"
-                >
-                  {skill}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <input
-          type="text"
-          placeholder="Target company"
-          className="bg-linkedin-card border border-linkedin-border rounded-md px-4 py-2 text-linkedin-text placeholder:text-sm placeholder:font-bold"
-          onChange={handleTargetCompanyChange}
-          value={targetCompany}
-        />
-
-        <label className="inline-block px-4 py-2 bg-linkedin-card rounded-md text-slate-400 hover:bg-linkedin-border cursor-pointer border border-linkedin-border font-bold text-sm">
-          Upload Resume
-          <input type="file" className="hidden" onChange={handleResumeChange} />
-        </label>
-
-        <input
-          type="url"
-          placeholder="GitHub link"
-          className="bg-linkedin-card border border-linkedin-border rounded-md px-4 py-2 text-linkedin-text placeholder:text-sm placeholder:font-bold"
-          onChange={handleGitUrlChange}
-          value={gitUrl}
-        />
-
-        <button
-          type="submit"
-          className="bg-green-700 text-linkedin-text px-4 py-2 rounded-md hover:bg-green-800 transition-colors duration-100 ease-linear font-bold"
-        >
-          Submit Info
-        </button>
+        <div className="text-sm text-right mt-2 text-linkedin-secondary-text">
+          Step {step} of 9
+        </div>
       </form>
     </div>
   );
 }
+
+const Step = ({ title, children }) => (
+  <div className="space-y-3">
+    <h2 className="text-2xl font-semibold mb-4">{title}</h2>
+    {children}
+  </div>
+);
+
+const ErrorText = ({ children }) => (
+  <p className="text-red-400 text-sm mt-1">{children}</p>
+);
