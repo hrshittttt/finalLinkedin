@@ -27,7 +27,7 @@ export default function Signup() {
     <>
       <img
         src="./components/Authentication/assets/LinkedinDarkFull.png"
-        className="max-w-28 max-h-7 relative left-4 top-4"
+        className="max-w-28 max-h-7 relative left-4 top-4 cursor-pointer"
         alt="LinkedIn Logo"
       />
       <div className="flex justify-center items-center min-h-screen">

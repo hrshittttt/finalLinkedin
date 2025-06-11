@@ -1,5 +1,4 @@
-import LoginForm from "../components/JobLens/LoginForm";
-import AutocompleteSearch from "../components/JobLens/something";
+import Signup from "../components/Authentication/Signup.jsx";
 export default function App() {
-  return <LoginForm />;
+  return <Signup />;
 }
