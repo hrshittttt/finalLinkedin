@@ -1,13 +1,5 @@
-import Login from "../components/Authentication/Login.jsx";
-import Header from "./Header.jsx";
-import Hero from "../components/Main/Hero.jsx";
-import Signup from "../components/Authentication/Signup.jsx";
-import Lens from "../components/JobLens/Lens.jsx";
-
+import LoginForm from "../components/JobLens/LoginForm";
+import AutocompleteSearch from "../components/JobLens/something";
 export default function App() {
-  return (
-    <>
-      <Lens />
-    </>
-  );
+  return <LoginForm />;
 }

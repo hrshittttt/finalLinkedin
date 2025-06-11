@@ -38,6 +38,10 @@ export default function Header() {
             <span>Jobs</span>
           </a>
           <a href="#" className="flex flex-col hover:text-white">
+            <FontAwesomeIcon icon="fa-solid fa-binoculars" />
+            <span>JobLens</span>
+          </a>
+          <a href="#" className="flex flex-col hover:text-white">
             <FontAwesomeIcon icon="fa-solid fa-message" />
             <span>Messaging</span>
           </a>
