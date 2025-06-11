@@ -1,6 +1,22 @@
 import { useState, useRef, useEffect } from "react";
 
 export default function LoginForm() {
+  const [name, setName] = useState("");
+  const [location, setLocation] = useState("");
+  const [experiences, setExperiences] = useState("");
+  const [education, setEducation] = useState("");
+  const [targetCompany, setTargetCompany] = useState("");
+  const [resume, setResume] = useState(null);
+  const [gitUrl, setGitURL] = useState("");
+
+  const handleNameChange = (e) => setName(e.target.value);
+  const handleLocationChange = (e) => setLocation(e.target.value);
+  const handleExperiencesChange = (e) => setExperiences(e.target.value);
+  const handleEducationChange = (e) => setEducation(e.target.value);
+  const handleTargetCompanyChange = (e) => setTargetCompany(e.target.value);
+  const handleResumeChange = (e) => setResume(e.target.files[0]);
+  const handleGitUrlChange = (e) => setGitURL(e.target.value);
+
   const skills = [
     "JavaScript",
     "TypeScript",
@@ -143,7 +159,16 @@ export default function LoginForm() {
 
   function handleSubmit(e) {
     e.preventDefault();
-    console.log("Submitted skills:", selectedSkills);
+    console.log("Submitted:", {
+      name,
+      location,
+      experiences,
+      education,
+      targetCompany,
+      resume,
+      gitUrl,
+      selectedSkills,
+    });
   }
 
   return (
@@ -161,12 +186,16 @@ export default function LoginForm() {
           placeholder="Full Name*"
           className="bg-linkedin-card border border-linkedin-border rounded-md px-4 py-2 text-linkedin-text placeholder:text-sm placeholder:font-bold"
           required
+          onChange={handleNameChange}
+          value={name}
         />
 
         <input
           type="text"
           placeholder="Location"
           className="bg-linkedin-card border border-linkedin-border rounded-md px-4 py-2 text-linkedin-text placeholder:text-sm placeholder:font-bold"
+          onChange={handleLocationChange}
+          value={location}
         />
 
         <input
@@ -174,12 +203,16 @@ export default function LoginForm() {
           placeholder="Experiences*"
           className="bg-linkedin-card border border-linkedin-border rounded-md px-4 py-2 text-linkedin-text placeholder:text-sm placeholder:font-bold"
           required
+          onChange={handleExperiencesChange}
+          value={experiences}
         />
 
         <input
           type="text"
           placeholder="Education"
           className="bg-linkedin-card border border-linkedin-border rounded-md px-4 py-2 text-linkedin-text placeholder:text-sm placeholder:font-bold"
+          onChange={handleEducationChange}
+          value={education}
         />
 
         {/* Skills search input */}
@@ -207,10 +240,10 @@ export default function LoginForm() {
           )}
         </div>
 
-        {/* Selected Skills - Wrapped vertically */}
+        {/* Selected Skills */}
         {selectedSkills.length > 0 && (
           <div className="w-full">
-            <div className="flex flex-wrap gap-2 w-full break-words">
+            <div className="flex flex-wrap gap-2 w-full">
               {selectedSkills.map((skill, index) => (
                 <span
                   key={index}
@@ -225,19 +258,23 @@ export default function LoginForm() {
 
         <input
           type="text"
-          placeholder="Target companies"
+          placeholder="Target company"
           className="bg-linkedin-card border border-linkedin-border rounded-md px-4 py-2 text-linkedin-text placeholder:text-sm placeholder:font-bold"
+          onChange={handleTargetCompanyChange}
+          value={targetCompany}
         />
 
         <label className="inline-block px-4 py-2 bg-linkedin-card rounded-md text-slate-400 hover:bg-linkedin-border cursor-pointer border border-linkedin-border font-bold text-sm">
           Upload Resume
-          <input type="file" className="hidden" />
+          <input type="file" className="hidden" onChange={handleResumeChange} />
         </label>
 
         <input
           type="url"
           placeholder="GitHub link"
           className="bg-linkedin-card border border-linkedin-border rounded-md px-4 py-2 text-linkedin-text placeholder:text-sm placeholder:font-bold"
+          onChange={handleGitUrlChange}
+          value={gitUrl}
         />
 
         <button

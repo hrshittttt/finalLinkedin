@@ -46,13 +46,16 @@ export default function Signup() {
               id="signup-email"
               value={mail}
               onChange={(e) => setMail(e.target.value)}
-              placeholder="Email"
+              placeholder=" "
               required
               className="peer w-full h-[52px] pt-5 pl-3 bg-linkedin-bg text-linkedin-text text-lg border border-linkedin-border rounded-md placeholder-transparent focus:outline-none focus:ring-2 focus:ring-linkedin-blue"
             />
             <label
               htmlFor="signup-email"
-              className="pointer-events-none absolute left-3 top-3 text-linkedin-secondary-text text-sm transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:text-sm"
+              className="absolute left-3 top-2 text-sm text-linkedin-secondary-text transition-all 
+      peer-focus:top-2 peer-focus:text-sm
+      peer-valid:top-2 peer-valid:text-sm
+      peer-placeholder-shown:top-4 peer-placeholder-shown:text-base"
             >
               Email
             </label>
@@ -65,13 +68,16 @@ export default function Signup() {
               id="signup-phone"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              placeholder="Phone Number"
+              placeholder=" "
               required
               className="peer w-full h-[52px] pt-5 pl-3 bg-linkedin-bg text-linkedin-text text-lg border border-linkedin-border rounded-md placeholder-transparent focus:outline-none focus:ring-2 focus:ring-linkedin-blue"
             />
             <label
               htmlFor="signup-phone"
-              className="pointer-events-none absolute left-3 top-3 text-linkedin-secondary-text text-sm transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:text-sm"
+              className="absolute left-3 top-2 text-sm text-linkedin-secondary-text transition-all 
+      peer-focus:top-2 peer-focus:text-sm
+      peer-valid:top-2 peer-valid:text-sm
+      peer-placeholder-shown:top-4 peer-placeholder-shown:text-base"
             >
               Phone Number
             </label>
@@ -84,13 +90,16 @@ export default function Signup() {
               id="signup-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
+              placeholder=" "
               required
               className="peer w-full h-[52px] pt-5 pl-3 bg-linkedin-bg text-linkedin-text text-lg border border-linkedin-border rounded-md placeholder-transparent focus:outline-none focus:ring-2 focus:ring-linkedin-blue"
             />
             <label
               htmlFor="signup-password"
-              className="pointer-events-none absolute left-3 top-3 text-linkedin-secondary-text text-sm transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:text-sm"
+              className="absolute left-3 top-2 text-sm text-linkedin-secondary-text transition-all 
+      peer-focus:top-2 peer-focus:text-sm
+      peer-valid:top-2 peer-valid:text-sm
+      peer-placeholder-shown:top-4 peer-placeholder-shown:text-base"
             >
               Password
             </label>
@@ -103,13 +112,16 @@ export default function Signup() {
               id="signup-confirm-password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm Password"
+              placeholder=" "
               required
               className="peer w-full h-[52px] pt-5 pl-3 bg-linkedin-bg text-linkedin-text text-lg border border-linkedin-border rounded-md placeholder-transparent focus:outline-none focus:ring-2 focus:ring-linkedin-blue"
             />
             <label
               htmlFor="signup-confirm-password"
-              className="pointer-events-none absolute left-3 top-3 text-linkedin-secondary-text text-sm transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:text-sm"
+              className="absolute left-3 top-2 text-sm text-linkedin-secondary-text transition-all 
+      peer-focus:top-2 peer-focus:text-sm
+      peer-valid:top-2 peer-valid:text-sm
+      peer-placeholder-shown:top-4 peer-placeholder-shown:text-base"
             >
               Confirm Password
             </label>

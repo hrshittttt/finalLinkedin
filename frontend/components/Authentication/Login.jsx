@@ -35,14 +35,15 @@ export default function Login() {
               required
               value={mail}
               onChange={handleMailChange}
-              placeholder="Email or Phone Number"
-              className="peer w-full h-[52px] pt-5 pl-3 bg-linkedin-bg text-linkedin-text text-lg border border-linkedin-border rounded-md placeholder-transparent focus:outline-none focus:ring-2 focus:ring-linkedin-blue"
+              placeholder=" "
+              className={`peer w-full h-[52px] pt-5 pl-3 bg-linkedin-bg text-linkedin-text text-lg border border-linkedin-border rounded-md placeholder-transparent focus:outline-none focus:ring-2 focus:ring-linkedin-blue`}
             />
             <label
               htmlFor="email"
-              className="pointer-events-none absolute left-3 top-3 text-linkedin-secondary-text text-sm transition-all 
-                peer-placeholder-shown:top-4 peer-placeholder-shown:text-base 
-                peer-focus:top-2 peer-focus:text-sm"
+              className="absolute left-3 top-2 text-sm text-linkedin-secondary-text transition-all 
+      peer-focus:top-2 peer-focus:text-sm
+      peer-valid:top-2 peer-valid:text-sm
+      peer-placeholder-shown:top-4 peer-placeholder-shown:text-base"
             >
               Email or Phone Number
             </label>
@@ -56,14 +57,15 @@ export default function Login() {
               required
               value={pass}
               onChange={handlePassChange}
-              placeholder="Password"
+              placeholder=" "
               className="peer w-full h-[52px] pt-5 pl-3 bg-linkedin-bg text-linkedin-text text-lg border border-linkedin-border rounded-md placeholder-transparent focus:outline-none focus:ring-2 focus:ring-linkedin-blue"
             />
             <label
               htmlFor="password"
-              className="pointer-events-none absolute left-3 top-3 text-linkedin-secondary-text text-sm transition-all 
-                peer-placeholder-shown:top-4 peer-placeholder-shown:text-base 
-                peer-focus:top-2 peer-focus:text-sm"
+              className="absolute left-3 top-2 text-sm text-linkedin-secondary-text transition-all 
+      peer-focus:top-2 peer-focus:text-sm
+      peer-valid:top-2 peer-valid:text-sm
+      peer-placeholder-shown:top-4 peer-placeholder-shown:text-base"
             >
               Password
             </label>
