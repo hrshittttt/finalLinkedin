@@ -1,6 +1,8 @@
-import Login from "../components/Authentication/Login.jsx";
-import Signup from "../components/Authentication/Signup";
-import LoginForm from "../components/JobLens/LoginForm.jsx";
+import JobHome from "../components/JobLens/JobHome.jsx";
 export default function App() {
-  return <LoginForm />;
+  return (
+    <>
+      <JobHome />
+    </>
+  );
 }
