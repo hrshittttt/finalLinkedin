@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { db } = require("../firebaseConfig");
+const {OpenAI} = require("openai");
 
 
 // POST: Update or create profile
@@ -61,5 +62,8 @@ router.get("/:uid", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+
+
 
 module.exports = router;
