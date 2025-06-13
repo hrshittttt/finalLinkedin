@@ -43,7 +43,6 @@ router.get("/login", verifyFirebaseToken, async (req, res) => {
     try {
       // You can get user info from req.user (decoded token)
       const userId = req.user.uid;
-  
       // Optionally, fetch additional user info from Firestore if you want
       const userDoc = await db.collection("users").doc(userId).get();
   

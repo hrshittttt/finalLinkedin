@@ -4,6 +4,7 @@ const { Console } = require('console')
 require('dotenv').config()
 const userRoutes = require('./routes/user.routes')
 const profileRoutes = require('./routes/profile.routes')
+const aiMockInterviewRoutes = require('./routes/aiMockInterview.routes')
 const PORT  = process.env.PORT || 5000
 
 const app = express()
@@ -13,6 +14,7 @@ app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use("/users",userRoutes)
 app.use("/profile",profileRoutes)
+app.use("/interview",aiMockInterviewRoutes)
 
 
 app.get("/",(req,res)=>{
