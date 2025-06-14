@@ -29,24 +29,6 @@ export default function Right() {
     },
   ];
 
-  const AnimatedText = ({ text }) => {
-    const words = text.split(" ");
-    return (
-      <motion.div className="flex flex-wrap gap-x-1">
-        {words.map((word, i) => (
-          <motion.span
-            key={i}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.04, duration: 0.4 }}
-          >
-            {word}
-          </motion.span>
-        ))}
-      </motion.div>
-    );
-  };
-
   return (
     <div className="relative top-5 px-4 md:left-40 flex flex-col gap-7">
       {/* Header Section */}
@@ -58,20 +40,20 @@ export default function Right() {
           A new way to help professionals land their dream jobs.
         </p>
 
-        <div className="text-linkedin-text flex flex-row gap-4 flex-wrap">
+        <div className="text-linkedin-text flex flex-wrap gap-3">
           {descriptions.map((item, index) => (
             <motion.button
               key={index}
               onClick={() => setActive(index)}
               whileTap={{ scale: 0.95 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className={`flex items-center gap-2 border border-linkedin-border p-2 px-2 rounded-lg bg-linkedin-card hover:bg-linkedin-border transition-all outline-none focus:outline-none ${
+              className={`flex items-center gap-2 border border-linkedin-border px-3 py-1.5 text-sm rounded-md bg-linkedin-card hover:bg-linkedin-border transition-all outline-none focus:outline-none ${
                 active === index
                   ? "ring-2 ring-linkedin-blue ring-offset-1 bg-linkedin-border text-white"
                   : ""
               }`}
             >
-              <FontAwesomeIcon icon={item.icon} className="text-lg" />
+              <FontAwesomeIcon icon={item.icon} className="text-base" />
               {item.title}
             </motion.button>
           ))}
@@ -83,32 +65,22 @@ export default function Right() {
         <AnimatePresence mode="wait">
           <motion.div
             key={active}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.4, ease: "easeInOut" }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
           >
-            <motion.h2
-              className="text-4xl font-semibold mb-4 text-linkedin-text flex items-center gap-3"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.4 }}
-            >
+            <motion.h2 className="text-4xl font-semibold mb-4 text-linkedin-text flex items-center gap-3">
               <FontAwesomeIcon icon={descriptions[active].icon} />
               {descriptions[active].title}
             </motion.h2>
 
-            <div className="text-slate-300 text-base leading-9 tracking-wide mb-6">
-              <AnimatedText text={descriptions[active].text} />
-            </div>
+            <p className="text-slate-300 text-base leading-9 tracking-wide mb-6">
+              {descriptions[active].text}
+            </p>
 
             <motion.button
               whileTap={{ scale: 0.97 }}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                delay: descriptions[active].text.split(" ").length * 0.04 + 0.5,
-              }}
               className="flex items-center gap-2 bg-linkedin-card border border-linkedin-border text-white py-3 px-7 text-lg rounded-lg hover:bg-linkedin-border transition-all"
             >
               <FontAwesomeIcon icon={faRocket} />
