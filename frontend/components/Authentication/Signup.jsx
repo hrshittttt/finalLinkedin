@@ -2,26 +2,48 @@ import { useState } from "react";
 
 export default function Signup() {
   const [mail, setMail] = useState("");
-  const [phone, setPhone] = useState("");
+  // const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+  
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
-    setError("");
-    console.log("Signup Submitted:", {
-      mail,
-      phone,
-      password,
-      confirmPassword,
-    });
+  
+    setError(""); // reset error
+    try {
+      const res = await fetch("http://localhost:4000/users/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: mail,
+          name: "sahnu", 
+          password: password,
+        }),
+      });
+  
+      const data = await res.json();
+  
+      if (res.ok) {
+        alert("✅ Signup Successful!");
+        
+      } else {
+        setError(data.error || "Something went wrong");
+      }
+    } catch (err) {
+      setError("Network error or server down");
+      console.error("Signup error:", err);
+    }
   };
+  
 
   return (
     <>
@@ -62,7 +84,7 @@ export default function Signup() {
           </div>
 
           {/* Phone */}
-          <div className="relative w-full max-w-[304px]">
+          {/* <div className="relative w-full max-w-[304px]">
             <input
               type="tel"
               id="signup-phone"
@@ -81,7 +103,7 @@ export default function Signup() {
             >
               Phone Number
             </label>
-          </div>
+          </div> */}
 
           {/* Password */}
           <div className="relative w-full max-w-[304px]">

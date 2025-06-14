@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 
 export default function Login() {
   const [mail, setMail] = useState("");
@@ -7,9 +8,33 @@ export default function Login() {
   const handleMailChange = (e) => setMail(e.target.value);
   const handlePassChange = (e) => setPass(e.target.value);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault(); // ✅ Prevent page reload
     console.log("Form submitted with:", { mail, pass });
+
+    try {
+      const res = await fetch("http://localhost:4000/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: mail,
+          password: pass,
+        }),
+      });
+  
+      const data = await res.json();
+  
+      if (!res.ok) {
+        throw new Error(data.error || "Login failed");
+      }
+  
+      console.log("✅ Login success:", data);
+      // Optionally save token or redirect
+    } catch (error) {
+      console.error("❌ Login Failed:", error.message);
+    }
   };
 
   return (
