@@ -1,4 +1,4 @@
-import JobHome from "../components/Authentication/Signup";
+import JobHome from "../components/JobLens/JobHome.jsx";
 export default function App() {
   return (
     <>

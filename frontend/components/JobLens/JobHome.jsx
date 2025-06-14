@@ -6,7 +6,7 @@ export default function JobHome() {
   return (
     <>
       <Header />
-      <div className="flex flex-row">
+      <div className="flex flex-row gap-5">
         <Left />
         <Right />
       </div>
