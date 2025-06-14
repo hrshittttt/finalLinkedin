@@ -1,4 +1,4 @@
-import JobHome from "../components/JobLens/JobHome.jsx";
+import JobHome from "../components/JobLens/Interview.jsx";
 export default function App() {
   return (
     <>
