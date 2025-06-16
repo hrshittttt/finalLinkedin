@@ -73,9 +73,9 @@ export default function AnalyticsTab({ data }) {
       {/* Header */}
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold text-linkedin-text">
-          Your Quiz Analytics
+          Your Interview Analytics
         </h1>
-        <p className="text-linkedin-secondary">
+        <p className="text-linkedin-secondary-text">
           Review your performance and improve effectively.
         </p>
       </div>
@@ -209,7 +209,7 @@ export default function AnalyticsTab({ data }) {
             <PolarGrid />
             <PolarAngleAxis
               dataKey="subject"
-              tick={{ fill: "currentColor", className: "text-linkedin-text" }}
+              tick={{ fill: "#FFFFFF", className: "text-linkedin-text" }}
             />
             <PolarRadiusAxis
               angle={30}
@@ -232,7 +232,7 @@ export default function AnalyticsTab({ data }) {
                     textAnchor="middle"
                     dominantBaseline="middle"
                     fontSize={10}
-                    className="text-linkedin-text"
+                    fill="#ffffff" // <-- THIS makes the number white
                   >
                     {payload.value}
                   </text>
