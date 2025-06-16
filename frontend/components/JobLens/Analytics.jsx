@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import {
@@ -9,7 +10,17 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import {
+  BsQuestionCircle,
+  BsCheckCircle,
+  BsXCircle,
+  BsGraphUp,
+  BsStarFill,
+  BsTools,
+  BsLightbulb,
+  BsExclamationTriangle,
+  BsBarChartLine,
+} from "react-icons/bs";
 
 export default function AnalyticsTab({ data }) {
   const {
@@ -22,118 +33,156 @@ export default function AnalyticsTab({ data }) {
     topicStats,
   } = data;
 
-  const accuracy = ((correctAnswers / totalQuestions) * 100).toFixed(1);
+  const [animatedScore, setAnimatedScore] = useState(0);
+  const accuracy = Math.round((correctAnswers / totalQuestions) * 100);
 
-  const highest = topicStats.reduce((a, b) => (a.score > b.score ? a : b));
-  const lowest = topicStats.reduce((a, b) => (a.score < b.score ? a : b));
-
-  const [progress, setProgress] = useState(0);
+  const bestTopic = topicStats.reduce((a, b) => (a.score > b.score ? a : b));
+  const worstTopic = topicStats.reduce((a, b) => (a.score < b.score ? a : b));
 
   useEffect(() => {
-    let current = 0;
-    const interval = setInterval(() => {
-      if (current >= score) {
-        clearInterval(interval);
+    let start = 0;
+    const duration = 1000;
+    const stepTime = 20;
+    const steps = duration / stepTime;
+    const increment = score / steps;
+
+    const animate = () => {
+      start += increment;
+      if (start >= score) {
+        setAnimatedScore(score);
       } else {
-        current++;
-        setProgress(current);
+        setAnimatedScore(Math.round(start));
+        setTimeout(animate, stepTime);
       }
-    }, 15);
-    return () => clearInterval(interval);
+    };
+
+    animate();
   }, [score]);
 
   return (
-    <div className="p-8 space-y-8 bg-linkedin-card text-linkedin-text rounded-2xl shadow-xl">
+    <div className="p-6 space-y-8 bg-linkedin-card text-linkedin-text">
+      <div className="flex justify-start relative bottom-10">
+        <a href="#">
+          <img
+            src="../public/Linkedin.png"
+            alt="LinkedIn Logo"
+            className="w-24 h-24 object-contain"
+          />
+        </a>
+      </div>
       {/* Header */}
-      <div className="text-center space-y-1">
-        <h1 className="text-4xl font-bold">📊 Interview Result</h1>
-        <p className="text-linkedin-secondary text-sm">
-          Here's a breakdown of your performance and areas to work on.
+      <div className="text-center space-y-2">
+        <h1 className="text-3xl font-bold text-linkedin-text">
+          Your Quiz Analytics
+        </h1>
+        <p className="text-linkedin-secondary">
+          Review your performance and improve effectively.
         </p>
       </div>
 
-      {/* Overview Section */}
-      <div className="flex flex-col md:flex-row gap-10 justify-center items-center">
-        {/* Progress Circle */}
-        <div className="w-40">
+      {/* Circular Progress */}
+      <div className="flex justify-center">
+        <div className="w-36">
           <CircularProgressbar
-            value={progress}
-            text={`${progress}%`}
+            value={animatedScore}
+            text={`${animatedScore}%`}
             styles={buildStyles({
               pathColor:
-                progress > 70
-                  ? "#00A0DC"
-                  : progress > 40
-                  ? "#F4A261"
-                  : "#E76F51",
+                score > 70 ? "#00A0DC" : score > 40 ? "#F4A261" : "#E76F51",
               textColor: "#00A0DC",
-              trailColor: "#E6F2F8",
-              textSize: "20px",
+              trailColor: "#eee",
             })}
           />
         </div>
-
-        {/* Quick Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-2 gap-4 w-full max-w-md">
-          {[
-            { label: "Total Questions", value: totalQuestions },
-            { label: "Correct", value: correctAnswers },
-            { label: "Wrong", value: wrongAnswers },
-            { label: "Accuracy", value: `${accuracy}%` },
-          ].map((item, i) => (
-            <div
-              key={i}
-              className="bg-linkedin-bg p-4 rounded-xl border border-linkedin-border shadow-md"
-            >
-              <p className="text-2xl font-bold text-linkedin-text">
-                {item.value}
-              </p>
-              <p className="text-linkedin-secondary text-sm">{item.label}</p>
-            </div>
-          ))}
-        </div>
       </div>
 
-      {/* Highlights */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Stats Row */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { title: "🏆 Best Topic", data: highest },
-          { title: "⚠️ Needs Work", data: lowest },
+          {
+            label: "Total Questions",
+            value: totalQuestions,
+            icon: (
+              <BsQuestionCircle className="inline-block mr-1 text-blue-500" />
+            ),
+          },
+          {
+            label: "Correct",
+            value: correctAnswers,
+            icon: (
+              <BsCheckCircle className="inline-block mr-1 text-green-500" />
+            ),
+          },
+          {
+            label: "Wrong",
+            value: wrongAnswers,
+            icon: <BsXCircle className="inline-block mr-1 text-red-500" />,
+          },
+          {
+            label: "Accuracy",
+            value: `${accuracy}%`,
+            icon: <BsGraphUp className="inline-block mr-1 text-purple-500" />,
+          },
         ].map((item, i) => (
-          <div
+          <motion.div
             key={i}
-            className="bg-linkedin-bg p-4 rounded-xl border border-linkedin-border"
+            whileHover={{ scale: 1.03 }}
+            className="border border-linkedin-border p-4 rounded-xl text-center bg-linkedin-bg"
           >
-            <h3 className="text-xl font-semibold mb-1">{item.title}</h3>
-            <p className="text-linkedin-secondary">
-              {item.data.subject} –{" "}
-              <span className="font-medium text-linkedin-text">
-                {item.data.score}%
-              </span>
+            <p className="text-xl font-semibold text-linkedin-text">
+              {item.value}
             </p>
-          </div>
+            <p className="text-linkedin-secondary">
+              {item.icon}
+              {item.label}
+            </p>
+          </motion.div>
         ))}
       </div>
 
-      {/* Improvement Tips */}
-      <div className="bg-linkedin-bg p-6 rounded-xl border border-linkedin-border">
-        <h2 className="text-xl font-semibold mb-2">🧠 Tips to Improve</h2>
-        <ul className="list-disc list-inside space-y-1 text-linkedin-secondary text-sm">
+      {/* Best & Worst Topics */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="border border-linkedin-border p-4 rounded-xl bg-linkedin-bg">
+          <h3 className="text-lg font-semibold text-linkedin-text flex items-center gap-2">
+            <BsStarFill className="text-yellow-400" />
+            Best Topic
+          </h3>
+          <p className="text-linkedin-secondary">{bestTopic.subject}</p>
+        </div>
+        <div className="border border-linkedin-border p-4 rounded-xl bg-linkedin-bg">
+          <h3 className="text-lg font-semibold text-linkedin-text flex items-center gap-2">
+            <BsTools className="text-orange-400" />
+            Needs Work
+          </h3>
+          <p className="text-linkedin-secondary">{worstTopic.subject}</p>
+        </div>
+      </div>
+
+      {/* Tips Section */}
+      <div className="border border-linkedin-border p-4 rounded-xl bg-linkedin-bg">
+        <h2 className="text-xl font-semibold mb-2 text-linkedin-text flex items-center gap-2">
+          <BsLightbulb className="text-yellow-300" />
+          Tips to Improve
+        </h2>
+        <ul className="list-disc list-inside space-y-1 text-linkedin-secondary">
           {improvementTips.map((tip, i) => (
             <li key={i}>{tip}</li>
           ))}
         </ul>
       </div>
 
-      {/* Incorrect Questions */}
-      <div className="bg-linkedin-bg p-6 rounded-xl border border-linkedin-border space-y-4">
-        <h2 className="text-xl font-semibold">❌ Review Incorrect Answers</h2>
+      {/* Incorrect Answers */}
+      <div className="border border-linkedin-border p-4 rounded-xl space-y-4 bg-linkedin-bg">
+        <h2 className="text-xl font-semibold text-linkedin-text flex items-center gap-2">
+          <BsExclamationTriangle className="text-red-500" />
+          Review Incorrect Answers
+        </h2>
         {incorrectQuestions.map((item, i) => (
           <div
             key={i}
-            className="border border-linkedin-border p-3 rounded-md hover:shadow transition-all bg-white/5"
+            className="border border-linkedin-border p-3 rounded-md hover:border-linkedin-border transition-colors"
           >
-            <p>
+            <p className="text-linkedin-text">
               <strong>Q:</strong> {item.question}
             </p>
             <p className="text-red-500">
@@ -142,7 +191,7 @@ export default function AnalyticsTab({ data }) {
             <p className="text-green-500">
               <strong>Correct Answer:</strong> {item.correctAnswer}
             </p>
-            <p className="text-linkedin-secondary text-sm">
+            <p className="text-linkedin-secondary">
               <strong>Explanation:</strong> {item.explanation}
             </p>
           </div>
@@ -150,26 +199,52 @@ export default function AnalyticsTab({ data }) {
       </div>
 
       {/* Radar Chart */}
-      <div className="bg-linkedin-bg p-6 rounded-xl border border-linkedin-border">
-        <h2 className="text-xl font-semibold mb-4">
-          📚 Topic-wise Performance
+      <div className="border border-linkedin-border p-4 rounded-xl bg-linkedin-bg">
+        <h2 className="text-xl font-semibold mb-4 text-linkedin-text flex items-center gap-2">
+          <BsBarChartLine className="text-sky-400" />
+          Topic-wise Performance
         </h2>
         <ResponsiveContainer width="100%" height={300}>
-          <RadarChart data={topicStats} outerRadius={90} cx="50%" cy="50%">
-            <PolarGrid stroke="#DCE6F1" />
-            <PolarAngleAxis dataKey="subject" tick={{ fill: "#E6F2F8" }} />
+          <RadarChart outerRadius={90} data={topicStats}>
+            <PolarGrid />
+            <PolarAngleAxis
+              dataKey="subject"
+              tick={{ fill: "currentColor", className: "text-linkedin-text" }}
+            />
             <PolarRadiusAxis
               angle={30}
               domain={[0, 100]}
-              tick={false}
+              tickLine={false}
               axisLine={false}
+              tick={({ payload, cx, cy }) => {
+                if (!payload || payload.coordinate === undefined) return null;
+
+                const radius = payload.coordinate;
+                const angle = -30;
+                const RADIAN = Math.PI / 180;
+                const x = cx + (radius + 10) * Math.cos(angle * RADIAN);
+                const y = cy + (radius + 10) * Math.sin(angle * RADIAN);
+
+                return (
+                  <text
+                    x={x}
+                    y={y}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fontSize={10}
+                    className="text-linkedin-text"
+                  >
+                    {payload.value}
+                  </text>
+                );
+              }}
             />
             <Radar
               name="Score"
               dataKey="score"
-              stroke="#00A0DC"
-              fill="#00A0DC"
-              fillOpacity={0.5}
+              stroke="#0077B5"
+              fill="#0077B5"
+              fillOpacity={0.6}
             />
           </RadarChart>
         </ResponsiveContainer>
