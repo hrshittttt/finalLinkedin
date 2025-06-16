@@ -2,10 +2,13 @@ const express = require("express");
 const router = express.Router();
 const { db } = require("../firebaseConfig");
 const {OpenAI} = require("openai");
+const { verifyFirebaseToken } = require("../middleware/user.middleware");
 
 
 // POST: Update or create profile
-router.post("/update", async (req, res) => {
+router.post("/update", verifyFirebaseToken,async (req, res) => {
+
+  
   const {
     uid,
     name,
@@ -18,11 +21,21 @@ router.post("/update", async (req, res) => {
     resumeUrl,
     githubURL,
   } = req.body;
+  console.log(uid)
+
+ 
+
+
 
   // Basic validation hai ye toh 
-  if (!uid || !name || !skills || !experience) {
-    return res.status(400).json({ error: "Required fields missing" });
-  }
+  if (
+  !uid || 
+  !name?.trim() || 
+  !Array.isArray(skills) || skills.length === 0 || 
+  !experience?.trim()
+) {
+  return res.status(400).json({ error: "Required fields missing or invalid" });
+}
 
   try {
     const profileData = {
@@ -30,13 +43,15 @@ router.post("/update", async (req, res) => {
       location: location || "",
       skills,
       experience,
-      education: education || [], // expects array [{ degree, institution, year, grade }]
+      education: education || [], // expects array [{ degree, institution, year, grade }] aesa ho skta hai
       dreamCompanies: dreamCompanies || [],
       interests: interests || [],
       resumeUrl: resumeUrl || "",
       githubURL: githubURL || "",
       updatedAt: new Date(),
     };
+
+     console.log(profileData)
 
     await db.collection("profiles").doc(uid).set(profileData, { merge: true });
 
@@ -62,8 +77,6 @@ router.get("/:uid", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
-
 
 
 module.exports = router;

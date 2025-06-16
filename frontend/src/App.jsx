@@ -1,6 +1,8 @@
 // In your App.jsx or page file
 import AnalyticsTab from "../components/JobLens/Analytics.jsx";
-
+import Login from "../components/Authentication/Login.jsx";
+import Signup from "../components/Authentication/Signup.jsx";
+import Profile from "../components/JobLens/LoginForm.jsx"
 const yourDataObject = {
   score: 72,
   totalQuestions: 20,
@@ -30,5 +32,13 @@ const yourDataObject = {
 };
 
 export default function Page() {
-  return <AnalyticsTab data={yourDataObject} />;
+  return (
+    <>
+    {/* <AnalyticsTab data={yourDataObject} /> */}
+    
+    <Signup />
+    <Login />
+    <Profile />
+    </>
+  );
 }

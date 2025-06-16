@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import axios from "axios";
 
 export default function LinkedInForm() {
   const [step, setStep] = useState(1);
@@ -188,21 +189,46 @@ export default function LinkedInForm() {
     setStep((s) => s - 1);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!validateStep()) return;
-    console.log({
-      name,
-      experiences,
-      selectedSkills,
-      location,
-      education,
-      targetCompany,
-      resume,
-      gitUrl,
-    });
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!validateStep()) return;
+
+  const token = localStorage.getItem("token");
+  const uid = localStorage.getItem("uid");
+
+  const profileData = {
+    uid,
+    name,
+    skills: selectedSkills,
+    experience: experiences,
+    location,
+    education,
+    dreamCompanies: [targetCompany],
+    resumeUrl: "ihtisrhfkih",
+    githubURL: gitUrl,
   };
 
+  try {
+    const res = await axios.post(
+      "http://localhost:4000/profile/update",
+      profileData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log("Backend Response:", res.data); // "Profile updated successfully" 
+
+    alert(" Profile updated successfully!");
+  } catch (err) {
+    console.error("Profile update error:", err.response?.data || err.message);
+    alert(err.response?.data?.error || "Something went wrong!");
+  }
+};
   const inputClass =
     "w-full h-10 py-3 pl-3 bg-linkedin-bg text-linkedin-text text-lg border border-linkedin-border rounded-md placeholder-transparent focus:outline-none focus:ring-2 focus:ring-linkedin-blue";
 
@@ -327,9 +353,9 @@ export default function LinkedInForm() {
             {step === 7 && (
               <Step title="Upload your resume">
                 <input
-                  type="file"
+                  type="text"
                   className={inputClass}
-                  onChange={(e) => setResume(e.target.files[0])}
+                  onChange={(e) => setResume(e.target.value)}
                 />
                 {errors.resume && <ErrorText>{errors.resume}</ErrorText>}
               </Step>

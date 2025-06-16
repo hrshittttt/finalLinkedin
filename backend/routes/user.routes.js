@@ -21,6 +21,7 @@ router.post("/register", checkExistingEmail, async (req, res) => {
     await db.collection("users").doc(userRecord.uid).set({
       email,
       name,
+       password, 
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
@@ -42,34 +43,38 @@ router.post("/login", async (req, res) => {
   if (!email || !password)
     return res.status(400).json({ error: "Email and password required" });
 
-    try {
-      // Firestore m secrh hoga user
-      const usersRef = db.collection("users");
-      const snapshot = await usersRef.where("email", "==", email).get();
-  
-      if (snapshot.empty) {
-        return res.status(404).json({ error: "User not found." });
-      }
-  
-      const userDoc = snapshot.docs[0];
-      const userData = userDoc.data();
-  
-      // Check password hoga
-      if (userData.password !== password) {
-        return res.status(401).json({ error: "Incorrect password." });
-      }
-  
-      // Login done
-      res.json({
-        message: "Login successful",
-        uid: userDoc.id,
-        email: userData.email,
-        name: userData.name
-      });
-    } catch (error) {
-      console.error("Login error:", error);
-      res.status(500).json({ error: "Something went wrong" });
+  try {
+    // Find user in Firestore
+    const usersRef = db.collection("users");
+    const snapshot = await usersRef.where("email", "==", email).get();
+
+    if (snapshot.empty) {
+      return res.status(404).json({ error: "User not found." });
     }
+
+    const userDoc = snapshot.docs[0];
+    const userData = userDoc.data();
+
+    // Check password
+    if (userData.password !== password) {
+      return res.status(401).json({ error: "Incorrect password." });
+    }
+
+    // Get Firebase Auth token
+    const userRecord = await admin.auth().getUserByEmail(email);
+    const token = await admin.auth().createCustomToken(userRecord.uid);
+
+    res.json({
+      message: "Login successful",
+      uid: userDoc.id,
+      email: userData.email,
+      name: userData.name,
+      token,
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ error: "Something went wrong" });
+  }
 });
 
   
