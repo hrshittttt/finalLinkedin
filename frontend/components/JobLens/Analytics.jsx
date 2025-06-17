@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import {
@@ -9,7 +9,7 @@ import {
   PolarRadiusAxis,
   ResponsiveContainer,
 } from "recharts";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   BsQuestionCircle,
   BsCheckCircle,
@@ -20,123 +20,124 @@ import {
   BsLightbulb,
   BsExclamationTriangle,
   BsBarChartLine,
+  BsChevronDown,
 } from "react-icons/bs";
 
 
-const data = {
-  "score": 15,
-  "totalQuestions": 4,
-  "correctAnswers": 0,
-  "wrongAnswers": 3,
-  "improvementTips": [
-    "Deep dive into MongoDB concurrency control mechanisms.",
-    "Practice coding common data structures and algorithms, especially linked lists.",
-    "Review common e-commerce search implementation and optimization strategies.",
-    "Make sure you provide answers, even if you are unsure."
-  ],
-  "incorrectQuestions": [
-    {
-      "question": "Describe the differences between optimistic and pessimistic locking in MongoDB and when you might choose one over the other.",
-      "yourAnswer": "[object Object]",
-      "correctAnswer": "Optimistic locking assumes conflicts are rare and allows multiple transactions to proceed without explicit locking. Before committing, it checks if the data has been modified since the transaction started. Pessimistic locking assumes conflicts are common and acquires locks on data before a transaction can access it, preventing other transactions from modifying the data. Choose optimistic locking when conflicts are rare, and performance is critical. Choose pessimistic locking when conflicts are frequent, and data consistency is paramount.",
-      "explanation": "Optimistic locking is good for high-read, low-write scenarios, while pessimistic locking is better for scenarios where data integrity is crucial and collisions are frequent. Think about real-world examples to solidify your understanding."
-    },
-    {
-      "question": "You're building a real-time collaborative document editor using React and Node.js with Express, storing document data in MongoDB. Describe how you would implement an efficient mechanism to handle concurrent edits to the same section of a document, minimizing conflicts and ensuring data consistency. Consider the technologies in your skill set (MongoDB, JavaScript, React, Node.js/Express).",
-      "yourAnswer": "[object Object]",
-      "correctAnswer": "Use operational transformation (OT) or conflict-free replicated data types (CRDTs) to handle concurrent edits. OT transforms operations to maintain consistency, while CRDTs ensure eventual consistency without explicit coordination. On the backend, use MongoDB's atomic operations (e.g., $push, $pull, $set) within a transaction with optimistic locking to apply changes. Use WebSockets for real-time communication between clients and the server. Debounce user input on the frontend to reduce the frequency of updates.",
-      "explanation": "This is a complex system design problem. Understanding real-time collaboration strategies like OT/CRDTs is essential. Also, consider database-level features like atomic operations and transactions for handling concurrency safely."
-    },
-    {
-      "question": "Given a singly linked list, describe an algorithm to detect if the list has a cycle. Can you do it with O(1) space complexity?",
-      "yourAnswer": "[object Object]",
-      "correctAnswer": "Use Floyd's cycle-finding algorithm (also known as the \"tortoise and hare\" algorithm). Have two pointers, one moving one step at a time (tortoise) and the other moving two steps at a time (hare). If there's a cycle, the hare will eventually meet the tortoise. If the hare reaches the end of the list (null), there's no cycle.",
-      "explanation": "Floyd's algorithm is the standard solution for cycle detection in linked lists with O(1) space complexity. Make sure you can explain the algorithm and its time complexity."
-    }
-  ],
-  "topicStats": [
-    {
-      "subject": "MongoDB",
-      "score": 0
-    },
-    {
-      "subject": "Data Structures (Linked Lists)",
-      "score": 0
-    },
-    {
-      "subject": "System Design",
-      "score": 0
-    },
-    {
-      "subject": "React",
-      "score": 0
-    },
-    {
-      "subject": "Node.js/Express",
-      "score": 0
-    }
-  ],
-  "feedbackBreakdown": [
-    {
-      "questionTitle": "MongoDB Concurrency",
-      "score": 0,
-      "whatWentWell": [],
-      "whatWasMissing": [
-        "Understanding of optimistic vs. pessimistic locking.",
-        "Concrete examples of when to use each type of locking.",
-        "Explaining practical differences in MongoDB."
-      ],
-      "howToImprove": [
-        "Study MongoDB's documentation on concurrency control.",
-        "Research real-world examples of using optimistic and pessimistic locking."
-      ]
-    },
-    {
-      "questionTitle": "Real-time Collaborative Editor",
-      "score": 5,
-      "whatWentWell": [],
-      "whatWasMissing": [
-        "Details on conflict resolution strategies (OT/CRDT).",
-        "Implementation details for real-time communication (WebSockets).",
-        "Backend implementation using MongoDB's atomic operations.",
-        "Missing any details"
-      ],
-      "howToImprove": [
-        "Research operational transformation (OT) and conflict-free replicated data types (CRDTs).",
-        "Study real-time collaborative editing architectures.",
-        "Practice implementing a basic real-time application using WebSockets and Node.js."
-      ]
-    },
-    {
-      "questionTitle": "Linked List Cycle Detection",
-      "score": 5,
-      "whatWentWell": [],
-      "whatWasMissing": [
-        "Implementation details on algorithm.",
-        "Mention of Floyd's cycle-finding algorithm."
-      ],
-      "howToImprove": [
-        "Practice implementing Floyd's cycle-finding algorithm from scratch.",
-        "Understand the time and space complexity of the algorithm."
-      ]
-    },
-    {
-      "questionTitle": "E-commerce Product Search",
-      "score": 5,
-      "whatWentWell": [],
-      "whatWasMissing": [
-        "Failed to respond to the question"
-      ],
-      "howToImprove": [
-        "Attempt the question, even if you are unsure of the answer"
-      ]
-    }
-  ],
-  "finalAdvice": "Bro you're close 🔥 just grind a bit more and you'll crush it!"
-};  
+// const data = {
+//   "score": 15,
+//   "totalQuestions": 4,
+//   "correctAnswers": 0,
+//   "wrongAnswers": 3,
+//   "improvementTips": [
+//     "Deep dive into MongoDB concurrency control mechanisms.",
+//     "Practice coding common data structures and algorithms, especially linked lists.",
+//     "Review common e-commerce search implementation and optimization strategies.",
+//     "Make sure you provide answers, even if you are unsure."
+//   ],
+//   "incorrectQuestions": [
+//     {
+//       "question": "Describe the differences between optimistic and pessimistic locking in MongoDB and when you might choose one over the other.",
+//       "yourAnswer": "[object Object]",
+//       "correctAnswer": "Optimistic locking assumes conflicts are rare and allows multiple transactions to proceed without explicit locking. Before committing, it checks if the data has been modified since the transaction started. Pessimistic locking assumes conflicts are common and acquires locks on data before a transaction can access it, preventing other transactions from modifying the data. Choose optimistic locking when conflicts are rare, and performance is critical. Choose pessimistic locking when conflicts are frequent, and data consistency is paramount.",
+//       "explanation": "Optimistic locking is good for high-read, low-write scenarios, while pessimistic locking is better for scenarios where data integrity is crucial and collisions are frequent. Think about real-world examples to solidify your understanding."
+//     },
+//     {
+//       "question": "You're building a real-time collaborative document editor using React and Node.js with Express, storing document data in MongoDB. Describe how you would implement an efficient mechanism to handle concurrent edits to the same section of a document, minimizing conflicts and ensuring data consistency. Consider the technologies in your skill set (MongoDB, JavaScript, React, Node.js/Express).",
+//       "yourAnswer": "[object Object]",
+//       "correctAnswer": "Use operational transformation (OT) or conflict-free replicated data types (CRDTs) to handle concurrent edits. OT transforms operations to maintain consistency, while CRDTs ensure eventual consistency without explicit coordination. On the backend, use MongoDB's atomic operations (e.g., $push, $pull, $set) within a transaction with optimistic locking to apply changes. Use WebSockets for real-time communication between clients and the server. Debounce user input on the frontend to reduce the frequency of updates.",
+//       "explanation": "This is a complex system design problem. Understanding real-time collaboration strategies like OT/CRDTs is essential. Also, consider database-level features like atomic operations and transactions for handling concurrency safely."
+//     },
+//     {
+//       "question": "Given a singly linked list, describe an algorithm to detect if the list has a cycle. Can you do it with O(1) space complexity?",
+//       "yourAnswer": "[object Object]",
+//       "correctAnswer": "Use Floyd's cycle-finding algorithm (also known as the \"tortoise and hare\" algorithm). Have two pointers, one moving one step at a time (tortoise) and the other moving two steps at a time (hare). If there's a cycle, the hare will eventually meet the tortoise. If the hare reaches the end of the list (null), there's no cycle.",
+//       "explanation": "Floyd's algorithm is the standard solution for cycle detection in linked lists with O(1) space complexity. Make sure you can explain the algorithm and its time complexity."
+//     }
+//   ],
+//   "topicStats": [
+//     {
+//       "subject": "MongoDB",
+//       "score": 0
+//     },
+//     {
+//       "subject": "Data Structures (Linked Lists)",
+//       "score": 0
+//     },
+//     {
+//       "subject": "System Design",
+//       "score": 0
+//     },
+//     {
+//       "subject": "React",
+//       "score": 0
+//     },
+//     {
+//       "subject": "Node.js/Express",
+//       "score": 0
+//     }
+//   ],
+//   "feedbackBreakdown": [
+//     {
+//       "questionTitle": "MongoDB Concurrency",
+//       "score": 0,
+//       "whatWentWell": [],
+//       "whatWasMissing": [
+//         "Understanding of optimistic vs. pessimistic locking.",
+//         "Concrete examples of when to use each type of locking.",
+//         "Explaining practical differences in MongoDB."
+//       ],
+//       "howToImprove": [
+//         "Study MongoDB's documentation on concurrency control.",
+//         "Research real-world examples of using optimistic and pessimistic locking."
+//       ]
+//     },
+//     {
+//       "questionTitle": "Real-time Collaborative Editor",
+//       "score": 5,
+//       "whatWentWell": [],
+//       "whatWasMissing": [
+//         "Details on conflict resolution strategies (OT/CRDT).",
+//         "Implementation details for real-time communication (WebSockets).",
+//         "Backend implementation using MongoDB's atomic operations.",
+//         "Missing any details"
+//       ],
+//       "howToImprove": [
+//         "Research operational transformation (OT) and conflict-free replicated data types (CRDTs).",
+//         "Study real-time collaborative editing architectures.",
+//         "Practice implementing a basic real-time application using WebSockets and Node.js."
+//       ]
+//     },
+//     {
+//       "questionTitle": "Linked List Cycle Detection",
+//       "score": 5,
+//       "whatWentWell": [],
+//       "whatWasMissing": [
+//         "Implementation details on algorithm.",
+//         "Mention of Floyd's cycle-finding algorithm."
+//       ],
+//       "howToImprove": [
+//         "Practice implementing Floyd's cycle-finding algorithm from scratch.",
+//         "Understand the time and space complexity of the algorithm."
+//       ]
+//     },
+//     {
+//       "questionTitle": "E-commerce Product Search",
+//       "score": 5,
+//       "whatWentWell": [],
+//       "whatWasMissing": [
+//         "Failed to respond to the question"
+//       ],
+//       "howToImprove": [
+//         "Attempt the question, even if you are unsure of the answer"
+//       ]
+//     }
+//   ],
+//   "finalAdvice": "Bro you're close 🔥 just grind a bit more and you'll crush it!"
+// };  
 
 
-export default function AnalyticsTab() {
+export default function AnalyticsTab({data}) {
   const {
     score,
     totalQuestions,
@@ -184,7 +185,6 @@ export default function AnalyticsTab() {
           />
         </a>
       </div>
-      {/* Header */}
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold text-linkedin-text">
           Your Interview Analytics
@@ -194,15 +194,13 @@ export default function AnalyticsTab() {
         </p>
       </div>
 
-      {/* Circular Progress */}
       <div className="flex justify-center">
         <div className="w-36">
           <CircularProgressbar
             value={animatedScore}
             text={`${animatedScore}%`}
             styles={buildStyles({
-              pathColor:
-                score > 70 ? "#00A0DC" : score > 40 ? "#F4A261" : "#E76F51",
+              pathColor: "#00A0DC",
               textColor: "#00A0DC",
               trailColor: "#eee",
             })}
@@ -210,7 +208,6 @@ export default function AnalyticsTab() {
         </div>
       </div>
 
-      {/* Stats Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
           {
@@ -254,7 +251,6 @@ export default function AnalyticsTab() {
         ))}
       </div>
 
-      {/* Best & Worst Topics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="border border-linkedin-border p-4 rounded-xl bg-linkedin-bg">
           <h3 className="text-lg font-semibold text-linkedin-text flex items-center gap-2">
@@ -272,7 +268,6 @@ export default function AnalyticsTab() {
         </div>
       </div>
 
-      {/* Tips Section */}
       <div className="border border-linkedin-border p-4 rounded-xl bg-linkedin-bg">
         <h2 className="text-xl font-semibold mb-2 text-linkedin-text flex items-center gap-2">
           <BsLightbulb className="text-yellow-300" />
@@ -285,34 +280,8 @@ export default function AnalyticsTab() {
         </ul>
       </div>
 
-      {/* Incorrect Answers */}
-      <div className="border border-linkedin-border p-4 rounded-xl space-y-4 bg-linkedin-bg">
-        <h2 className="text-xl font-semibold text-linkedin-text flex items-center gap-2">
-          <BsExclamationTriangle className="text-red-500" />
-          Review Incorrect Answers
-        </h2>
-        {incorrectQuestions.map((item, i) => (
-          <div
-            key={i}
-            className="border border-linkedin-border p-3 rounded-md hover:border-linkedin-border transition-colors"
-          >
-            <p className="text-linkedin-text">
-              <strong>Q:</strong> {item.question}
-            </p>
-            <p className="text-red-500">
-              <strong>Your Answer:</strong> {item.yourAnswer}
-            </p>
-            <p className="text-green-500">
-              <strong>Correct Answer:</strong> {item.correctAnswer}
-            </p>
-            <p className="text-linkedin-secondary">
-              <strong>Explanation:</strong> {item.explanation}
-            </p>
-          </div>
-        ))}
-      </div>
+      <IncorrectAnswersAccordion incorrectQuestions={incorrectQuestions} />
 
-      {/* Radar Chart */}
       <div className="border border-linkedin-border p-4 rounded-xl bg-linkedin-bg">
         <h2 className="text-xl font-semibold mb-4 text-linkedin-text flex items-center gap-2">
           <BsBarChartLine className="text-sky-400" />
@@ -332,7 +301,6 @@ export default function AnalyticsTab() {
               axisLine={false}
               tick={({ payload, cx, cy }) => {
                 if (!payload || payload.coordinate === undefined) return null;
-
                 const radius = payload.coordinate;
                 const angle = -30;
                 const RADIAN = Math.PI / 180;
@@ -346,7 +314,7 @@ export default function AnalyticsTab() {
                     textAnchor="middle"
                     dominantBaseline="middle"
                     fontSize={10}
-                    fill="#ffffff" // <-- THIS makes the number white
+                    fill="#ffffff"
                   >
                     {payload.value}
                   </text>
@@ -364,5 +332,80 @@ export default function AnalyticsTab() {
         </ResponsiveContainer>
       </div>
     </div>
+  );
+}
+
+function IncorrectAnswersAccordion({ incorrectQuestions }) {
+  const [activeIndex, setActiveIndex] = useState(null);
+  const toggleAccordion = (index) => {
+    setActiveIndex((prev) => (prev === index ? null : index));
+  };
+
+  return (
+    <div className="border border-linkedin-border p-4 rounded-xl bg-linkedin-bg">
+      <h2 className="text-xl font-semibold text-linkedin-text flex items-center gap-2 mb-4">
+        <BsExclamationTriangle className="text-red-500" />
+        Review Incorrect Answers
+      </h2>
+      <div className="space-y-2">
+        {incorrectQuestions.map((item, i) => {
+          const isOpen = activeIndex === i;
+          return (
+            <div key={i} className="border border-linkedin-border rounded-md">
+              <button
+                onClick={() => toggleAccordion(i)}
+                className="w-full flex justify-between items-center px-4 py-3 text-left font-medium text-linkedin-text transition-colors duration-200 hover:bg-linkedin-border"
+              >
+                <span>
+                  <strong>Q:</strong> {item.question}
+                </span>
+                <motion.span
+                  animate={{ rotate: isOpen ? 180 : 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <BsChevronDown className="text-lg" />
+                </motion.span>
+              </button>
+              <AnimatePresence initial={false}>
+                {isOpen && (
+                  <AccordionContent>
+                    <p className="text-red-500">
+                      <strong>Your Answer:</strong> {item.yourAnswer}
+                    </p>
+                    <p className="text-green-500">
+                      <strong>Correct Answer:</strong> {item.correctAnswer}
+                    </p>
+                    <p className="text-linkedin-secondary">
+                      <strong>Explanation:</strong> {item.explanation}
+                    </p>
+                  </AccordionContent>
+                )}
+              </AnimatePresence>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function AccordionContent({ children }) {
+  const ref = useRef(null);
+  const [height, setHeight] = useState(0);
+  useEffect(() => {
+    if (ref.current) setHeight(ref.current.scrollHeight);
+  }, [ref]);
+  return (
+    <motion.div
+      initial={{ height: 0, opacity: 0 }}
+      animate={{ height, opacity: 1 }}
+      exit={{ height: 0, opacity: 0 }}
+      transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+      className="overflow-hidden"
+    >
+      <div ref={ref} className="px-4 pb-4 space-y-2">
+        {children}
+      </div>
+    </motion.div>
   );
 }

@@ -2,48 +2,47 @@ import { useState } from "react";
 
 export default function Signup() {
   const [mail, setMail] = useState("");
-  // const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
-  
-    setError(""); // reset error
+
+    setError("");
+    setIsLoading(true);
+
     try {
       const res = await fetch("http://localhost:4000/users/register", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: mail,
-          name: "sahnu", 
+          name: "sahnu",
           password: password,
         }),
       });
-  
+
       const data = await res.json();
-  
       if (res.ok) {
         alert("✅ Signup Successful!");
-        
       } else {
         setError(data.error || "Something went wrong");
       }
     } catch (err) {
       setError("Network error or server down");
       console.error("Signup error:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
-  
 
   return (
     <>
@@ -74,36 +73,15 @@ export default function Signup() {
             />
             <label
               htmlFor="signup-email"
-              className="absolute left-3 top-2 text-sm text-linkedin-secondary-text transition-all 
-      peer-focus:top-2 peer-focus:text-sm
-      peer-valid:top-2 peer-valid:text-sm
-      peer-placeholder-shown:top-4 peer-placeholder-shown:text-base"
+              className={`absolute left-3 text-linkedin-secondary-text transition-all ${
+                mail.length > 0
+                  ? "top-1.5 text-xs"
+                  : "peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-focus:top-1.5 peer-focus:text-xs"
+              }`}
             >
               Email
             </label>
           </div>
-
-          {/* Phone */}
-          {/* <div className="relative w-full max-w-[304px]">
-            <input
-              type="tel"
-              id="signup-phone"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder=" "
-              required
-              className="peer w-full h-[52px] pt-5 pl-3 bg-linkedin-bg text-linkedin-text text-lg border border-linkedin-border rounded-md placeholder-transparent focus:outline-none focus:ring-2 focus:ring-linkedin-blue"
-            />
-            <label
-              htmlFor="signup-phone"
-              className="absolute left-3 top-2 text-sm text-linkedin-secondary-text transition-all 
-      peer-focus:top-2 peer-focus:text-sm
-      peer-valid:top-2 peer-valid:text-sm
-      peer-placeholder-shown:top-4 peer-placeholder-shown:text-base"
-            >
-              Phone Number
-            </label>
-          </div> */}
 
           {/* Password */}
           <div className="relative w-full max-w-[304px]">
@@ -118,10 +96,11 @@ export default function Signup() {
             />
             <label
               htmlFor="signup-password"
-              className="absolute left-3 top-2 text-sm text-linkedin-secondary-text transition-all 
-      peer-focus:top-2 peer-focus:text-sm
-      peer-valid:top-2 peer-valid:text-sm
-      peer-placeholder-shown:top-4 peer-placeholder-shown:text-base"
+              className={`absolute left-3 text-linkedin-secondary-text transition-all ${
+                password.length > 0
+                  ? "top-1.5 text-xs"
+                  : "peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-focus:top-1.5 peer-focus:text-xs"
+              }`}
             >
               Password
             </label>
@@ -140,10 +119,11 @@ export default function Signup() {
             />
             <label
               htmlFor="signup-confirm-password"
-              className="absolute left-3 top-2 text-sm text-linkedin-secondary-text transition-all 
-      peer-focus:top-2 peer-focus:text-sm
-      peer-valid:top-2 peer-valid:text-sm
-      peer-placeholder-shown:top-4 peer-placeholder-shown:text-base"
+              className={`absolute left-3 text-linkedin-secondary-text transition-all ${
+                confirmPassword.length > 0
+                  ? "top-1.5 text-xs"
+                  : "peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-focus:top-1.5 peer-focus:text-xs"
+              }`}
             >
               Confirm Password
             </label>
@@ -160,17 +140,47 @@ export default function Signup() {
             <label htmlFor="show-password">Show Password</label>
           </div>
 
+          {/* Error Message */}
           {error && (
             <div className="text-red-500 text-sm w-full max-w-[304px] text-center">
               {error}
             </div>
           )}
 
+          {/* Submit Button */}
           <button
             type="submit"
-            className="w-full max-w-[304px] h-[52px] text-lg bg-linkedin-blue text-linkedin-text border border-linkedin-border rounded-md hover:bg-linkedin-hover-blue"
+            disabled={isLoading}
+            className={`w-full max-w-[304px] h-[52px] text-lg border border-linkedin-border rounded-md flex items-center justify-center gap-2 transition-all ${
+              isLoading
+                ? "bg-linkedin-bg text-linkedin-secondary-text cursor-not-allowed"
+                : "bg-linkedin-blue text-linkedin-text hover:bg-linkedin-hover-blue"
+            }`}
           >
-            Sign Up
+            {isLoading ? (
+              <svg
+                className="animate-spin h-5 w-5 text-linkedin-secondary-text"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v8H4z"
+                />
+              </svg>
+            ) : (
+              "Sign Up"
+            )}
           </button>
         </form>
       </div>
