@@ -121,56 +121,55 @@ router.post("/end", async (req, res) => {
       question: q,
       answer: answers[idx]?.answer || "",
     }));
+    
 
   function evalPrompt({ questions, answers }) {
   return `
-You're a friendly AI interview coach helping a young dev understand their mock interview performance clearly.
+You're a friendly AI interview coach helping a dev assess their mock interview performance.
 
-🧠 Use clear language, Gen-Z tone (chill, helpful), and emojis (✅❌🔥). But your response **must be in pure JSON format**, not markdown or bullet points.
+Analyze the user's answers carefully. Do NOT accept gibberish or vague replies as correct.
 
-🎯 Here's the structure of your JSON output:
+For each question:
+- Check if the user answer matches the expected concept (provided below).
+- Score the question out of 10.
+- Generate JSON feedback.
+
+Return response in **pure JSON** only. Don't add any text or markdown.
+
+ Question-Answer Data:
+
+${questions.map((q, i) =>`Q${i + 1}: ${q}\nA${i + 1}: ${answers[i] ? JSON.stringify(answers[i]) : "No answer provided"}`).join("\n\n")}
+
+ JSON Structure:
 {
-  "score": 15,
-  "totalQuestions": 3,
-  "correctAnswers": 1,
-  "wrongAnswers": 2,
-  "improvementTips": ["tip1", "tip2", ...],
-  "incorrectQuestions": [
+  score: 24,
+  totalQuestions: 3,
+  correctAnswers: 2,
+  wrongAnswers: 1,
+  improvementTips: ["tips1", "tips2", "tips3"], (in 5-10 words based on answers)
+
+  incorrectQuestions: [
     {
-      "question": "The full question text",
-      "yourAnswer": "User's submitted answer",
-      "correctAnswer": "What they should've answered",
-      "explanation": "Explain the concept clearly"
+      question: "...",
+      yourAnswer: "...",
+      correctAnswer: "...", (in 10-20 words)
+      explanation: "..."
     }
   ],
-  "topicStats": [
-    { "subject": "React", "score": 50 },
-    { "subject": "JS", "score": 30 },
-    ...
+  topicStats: [
+    { subject: "React", score: 60 },
+    { subject: "JS", score: 40 }
+     ...,
   ],
-  "feedbackBreakdown": [
-    {
-      "questionTitle": "MongoDB Concurrency",
-      "score": 5,
-      "whatWentWell": ["..."],
-      "whatWasMissing": ["..."],
-      "howToImprove": ["..."]
-    },
-    ...
-  ],
-  "finalAdvice": "Bro you're close 🔥 just grind a bit more and you'll crush it!"
+  finalAdvice: "...." (in 10-20 words based on answers)
 }
-
-📌 Only return valid JSON. Don't wrap it in triple backticks, markdown, or explanation text.
-
-Now analyze the following mock interview and return the result as JSON:
-
-${questions.map((q, i) => `Q${i + 1}: ${q}\nA${i + 1}: ${answers[i] || "No answer provided"}`).join("\n\n")}
 `;
 }
 
 
-    // 🧠 CALL the evalPrompt to get actual text
+
+console.log(questions, answers);
+    //  call kre hai eval promt ko jo apn ko promt dega wo apn gemini ko bhejenge or fed backe dega wo
     const prompt = evalPrompt({ questions, answers });
 
     const aiRes = await axios.post(

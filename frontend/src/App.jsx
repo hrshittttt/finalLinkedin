@@ -3,7 +3,7 @@ import AnalyticsTab from "../components/JobLens/Analytics.jsx";
 import Login from "../components/Authentication/Login.jsx";
 import Signup from "../components/Authentication/Signup.jsx";
 import Profile from "../components/JobLens/LoginForm.jsx";
-import Interview from "../components/JobLens/Interview.jsx";
+// import Interview from "../components/JobLens/Interview.jsx";
 import JobHome from "../components/JobLens/ProfileBasedInterview.jsx";
 
 
