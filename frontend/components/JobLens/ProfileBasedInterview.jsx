@@ -6,7 +6,7 @@ import AnalyticsTab from "./Analytics";
 
 export default function ProfileInterview() {
   const [question, setQuestion] = useState("");
-  const [currentIndex, setCurrentIndex] = useState(-1); // -1 = instruction screen
+  const [currentIndex, setCurrentIndex] = useState(-1);
   const [answer, setAnswer] = useState("");
   const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -14,6 +14,8 @@ export default function ProfileInterview() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
   const [sessionId, setSessionId] = useState(null);
+  const [feedback, setFeedback] = useState(false);
+  const [feedbackData, setFeedbackData] = useState("");
 
 
   const uid = localStorage.getItem("uid");
@@ -70,23 +72,24 @@ export default function ProfileInterview() {
     };
 
 
-     const endInterview = async () => {
-      console.log("answers", answers);
-      console.log("udid", uid);
-      console.log("sessionId", sessionId);
+   const endInterview = async () => {
+      setFeedbackData("");
+      
     try {
        const res = await axios.post(`http://localhost:4000/interview/end`, {
         uid,
         sessionId,
       });
-      setSubmitted(flase);
-      <AnalyticsTab data={res.data.feedback} />
+      setSubmitted(false);
+      setFeedback(true);
+      setFeedbackData(res.data.feedback);
+      
 
       
 
-      console.log("📝 Final Feedback:", res.data.feedback);
+  
       alert("Interview ended! Feedback logged in console.");
-      // TODO: Navigate to feedback page later
+      
     } catch (err) {
       console.error("End error:", err.response?.data || err.message);
       setError("Failed to end interview");
@@ -113,6 +116,11 @@ export default function ProfileInterview() {
       </div>
     );
   }
+  if (feedback) {
+    return <AnalyticsTab response={feedbackData} />;
+  }
+
+
 
   return (
     <>
