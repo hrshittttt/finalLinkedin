@@ -2,7 +2,11 @@
 import AnalyticsTab from "../components/JobLens/Analytics.jsx";
 import Login from "../components/Authentication/Login.jsx";
 import Signup from "../components/Authentication/Signup.jsx";
-import Profile from "../components/JobLens/LoginForm.jsx"
+import Profile from "../components/JobLens/LoginForm.jsx";
+import Interview from "../components/JobLens/Interview.jsx";
+import JobHome from "../components/JobLens/JobHome.jsx";
+
+
 const yourDataObject = {
   score: 72,
   totalQuestions: 20,
@@ -34,11 +38,12 @@ const yourDataObject = {
 export default function Page() {
   return (
     <>
-    {/* <AnalyticsTab data={yourDataObject} /> */}
-    
+    {/* <AnalyticsTab />
     <Signup />
     <Login />
     <Profile />
+    <Interview /> */}
+    <JobHome />
     </>
   );
 }

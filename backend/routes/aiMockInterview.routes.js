@@ -65,6 +65,7 @@ router.post("/start", async (req, res) => {
 // ✅ 2. ANSWER AND NEXT QUESTION
 router.post("/answer", async (req, res) => {
   const { uid, sessionId, answer } = req.body;
+  console.log(sessionId)
   if (!uid || !sessionId || !answer) return res.status(400).json({ error: "Missing fields" });
 
   try {
@@ -121,47 +122,53 @@ router.post("/end", async (req, res) => {
       answer: answers[idx]?.answer || "",
     }));
 
-    function evalPrompt({ questions, answers }) {
-      return `
+  function evalPrompt({ questions, answers }) {
+  return `
 You're a friendly AI interview coach helping a young dev understand their mock interview performance clearly.
 
-🧠 Use clear language, Gen-Z style tone (chill, helpful), emojis (✅❌🔥), and bullet points to make it super easy to understand.
+🧠 Use clear language, Gen-Z tone (chill, helpful), and emojis (✅❌🔥). But your response **must be in pure JSON format**, not markdown or bullet points.
 
-📋 Format your response like this:
+🎯 Here's the structure of your JSON output:
+{
+  "score": 15,
+  "totalQuestions": 3,
+  "correctAnswers": 1,
+  "wrongAnswers": 2,
+  "improvementTips": ["tip1", "tip2", ...],
+  "incorrectQuestions": [
+    {
+      "question": "The full question text",
+      "yourAnswer": "User's submitted answer",
+      "correctAnswer": "What they should've answered",
+      "explanation": "Explain the concept clearly"
+    }
+  ],
+  "topicStats": [
+    { "subject": "React", "score": 50 },
+    { "subject": "JS", "score": 30 },
+    ...
+  ],
+  "feedbackBreakdown": [
+    {
+      "questionTitle": "MongoDB Concurrency",
+      "score": 5,
+      "whatWentWell": ["..."],
+      "whatWasMissing": ["..."],
+      "howToImprove": ["..."]
+    },
+    ...
+  ],
+  "finalAdvice": "Bro you're close 🔥 just grind a bit more and you'll crush it!"
+}
 
----
+📌 Only return valid JSON. Don't wrap it in triple backticks, markdown, or explanation text.
 
-🎯 **Overall Score:** X / 30  
-Quick summary: Mention if the answers showed understanding, or if major parts were skipped.
-
----
-
-💡 **Q1: [Short Title]**  
-**Score:** X / 10
-
-✅ What went well:
-- Bullet points of what the answer got right
-
-❌ What was missing:
-- Bullet points of what's missing or incomplete
-
-🛠️ How to improve:
-- Bullet points of tips written casually (Gen-Z style)
-
----
-
-Repeat the above for Q2 and Q3.
-
-🎁 **Final Advice (Gemini Style):**  
-1-2 lines of motivational Gen-Z tips, like "Bro you're close 🔥 just grind a bit more and you'll crush it!"
-
----
-
-Now analyze the following mock interview:
+Now analyze the following mock interview and return the result as JSON:
 
 ${questions.map((q, i) => `Q${i + 1}: ${q}\nA${i + 1}: ${answers[i] || "No answer provided"}`).join("\n\n")}
 `;
-    }
+}
+
 
     // 🧠 CALL the evalPrompt to get actual text
     const prompt = evalPrompt({ questions, answers });
