@@ -1,55 +1,98 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import axios from "axios";
+import AnalyticsTab from "./Analytics";
 
 export default function ProfileInterview() {
-  const [questions, setQuestions] = useState([]);
+  const [question, setQuestion] = useState("");
   const [currentIndex, setCurrentIndex] = useState(-1); // -1 = instruction screen
+  const [answer, setAnswer] = useState("");
   const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [sessionId, setSessionId] = useState(null);
 
-  useEffect(() => {
-    async function fetchQuestions() {
+
+  const uid = localStorage.getItem("uid");
+  const token = localStorage.getItem("token");
+
+  const startInterview = async () => {
+    try {
       setLoading(true);
-      const mockQuestions = [
-        "What's your name?",
-        "What is your experience?",
-        "What are your top skills?",
-        "Where are you located?",
-        "What is your GitHub URL?",
-      ];
-      setTimeout(() => {
-        setQuestions(mockQuestions);
-        setAnswers([]);
-        setLoading(false);
-      }, 1000);
-    }
-    fetchQuestions();
-  }, []);
+      const res = await axios.post(`http://localhost:4000/interview/start`, {
+        uid,
+        difficulty: "medium",
+      });
 
-  const handleChange = (value) => {
-    const updated = [...answers];
-    updated[currentIndex] = value;
-    setAnswers(updated);
-    if (error) setError("");
+      setQuestion(res.data.question);
+      setSessionId(res.data.sessionId);
+      setAnswers([]);
+      setCurrentIndex(0);
+    } catch (err) {
+      console.error("Start error:", err.response?.data || err.message);
+      setError("Failed to start interview");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSubmit = async () => {
-    const hasValidAnswer = answers.some((ans) => ans && ans.trim() !== "");
-    if (!hasValidAnswer) {
-      setError("Please answer some questions first");
-      return;
-    }
 
-    setError("");
-    setSubmitting(true);
-    await new Promise((res) => setTimeout(res, 2000));
-    setSubmitting(false);
-    setSubmitted(true);
+  const sendAnswer = async () => {
+      if (!answer.trim()) {
+        setError("Answer cannot be empty");
+        return;
+      }
+  
+      setSubmitting(true);
+      setError("");
+  
+      try {
+        const res = await axios.post(`http://localhost:4000/interview/answer`, {
+          uid,
+          sessionId,
+          answer,
+        });
+  
+        setAnswers((prev) => [...prev, answer]);
+        setAnswer("");
+        setQuestion(res.data.question);
+        setCurrentIndex((i) => i + 1);
+
+      } catch (err) {
+        console.error("Answer error:", err.response?.data || err.message);
+        setError("Failed to send answer");
+      } finally {
+        setSubmitting(false);
+      }
+    };
+
+
+     const endInterview = async () => {
+      console.log("answers", answers);
+      console.log("udid", uid);
+      console.log("sessionId", sessionId);
+    try {
+       const res = await axios.post(`http://localhost:4000/interview/end`, {
+        uid,
+        sessionId,
+      });
+      setSubmitted(flase);
+      <AnalyticsTab data={res.data.feedback} />
+
+      
+
+      console.log("📝 Final Feedback:", res.data.feedback);
+      alert("Interview ended! Feedback logged in console.");
+      // TODO: Navigate to feedback page later
+    } catch (err) {
+      console.error("End error:", err.response?.data || err.message);
+      setError("Failed to end interview");
+    }
   };
+
 
   const buttonBase =
     "w-[100px] h-9 px-3 py-1.5 rounded text-white text-sm flex items-center justify-center gap-1";
@@ -107,7 +150,7 @@ export default function ProfileInterview() {
               </p>
               <button
                 className="bg-linkedin-blue text-white px-4 py-2 rounded hover:bg-linkedin-hover-blue"
-                onClick={() => setCurrentIndex(0)}
+                onClick={startInterview}
               >
                 Start
               </button>
@@ -128,7 +171,7 @@ export default function ProfileInterview() {
                     <h2 className="text-xl font-semibold mb-2">
                       Question {currentIndex + 1}
                     </h2>
-                    <p className="text-lg">{questions[currentIndex]}</p>
+                    <p className="text-lg">{question}</p>
                   </motion.div>
                 </AnimatePresence>
               </div>
@@ -140,42 +183,14 @@ export default function ProfileInterview() {
               <div className="w-1/2 p-6 flex flex-col justify-between relative">
                 {/* Top Buttons */}
                 <div className="absolute top-4 right-6 flex gap-2">
-                  <button
-                    type="button"
-                    className={`${buttonBase} ${
-                      currentIndex <= 0
-                        ? "opacity-30 cursor-not-allowed bg-gray-500"
-                        : "bg-gray-600 hover:bg-gray-700"
-                    }`}
-                    disabled={currentIndex <= 0}
-                    onClick={() => setCurrentIndex((i) => Math.max(i - 1, 0))}
-                  >
-                    <FaArrowLeft />
-                    Back
-                  </button>
+                 
 
                   <button
                     type="button"
                     className={`${buttonBase} bg-linkedin-blue hover:bg-linkedin-hover-blue`}
-                    onClick={() => {
-                      const currentAnswer = answers[currentIndex] || "";
-                      if (currentAnswer.trim() === "") {
-                        setError(
-                          "Please enter a valid answer before continuing."
-                        );
-                        return;
-                      }
-                      setError("");
-                      setAnswers((prev) => {
-                        const newArr = [...prev];
-                        if (!newArr[currentIndex + 1])
-                          newArr[currentIndex + 1] = "";
-                        return newArr;
-                      });
-                      setCurrentIndex((i) => i + 1);
-                    }}
+                    onClick={sendAnswer}
                   >
-                    Next <FaArrowRight />
+                    Next Question<FaArrowRight />
                   </button>
                 </div>
 
@@ -183,8 +198,8 @@ export default function ProfileInterview() {
                 <div className="pt-12">
                   <textarea
                     className="w-full h-48 py-3 px-3 bg-linkedin-bg text-linkedin-text text-base border border-linkedin-border rounded-md focus:outline-none focus:ring-2 focus:ring-linkedin-blue resize-none"
-                    value={answers[currentIndex] || ""}
-                    onChange={(e) => handleChange(e.target.value)}
+                    value={answer}
+                    onChange={(e) => setAnswer(e.target.value)}
                     placeholder="Type your answer..."
                   />
                   {error && (
@@ -204,12 +219,15 @@ export default function ProfileInterview() {
                         : "bg-green-600 hover:bg-green-700"
                     }`}
                     disabled={submitting || currentIndex === 0}
-                    onClick={handleSubmit}
+                    onClick={() => {
+                      endInterview();
+                      setSubmitted(true);
+                    }}
                   >
                     {submitting ? (
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     ) : (
-                      "Submit"
+                      "End Interview"
                     )}
                   </button>
                 </div>

@@ -23,7 +23,121 @@ import {
   BsChevronDown,
 } from "react-icons/bs";
 
-export default function AnalyticsTab({ data }) {
+
+// const data = {
+//   "score": 15,
+//   "totalQuestions": 4,
+//   "correctAnswers": 0,
+//   "wrongAnswers": 3,
+//   "improvementTips": [
+//     "Deep dive into MongoDB concurrency control mechanisms.",
+//     "Practice coding common data structures and algorithms, especially linked lists.",
+//     "Review common e-commerce search implementation and optimization strategies.",
+//     "Make sure you provide answers, even if you are unsure."
+//   ],
+//   "incorrectQuestions": [
+//     {
+//       "question": "Describe the differences between optimistic and pessimistic locking in MongoDB and when you might choose one over the other.",
+//       "yourAnswer": "[object Object]",
+//       "correctAnswer": "Optimistic locking assumes conflicts are rare and allows multiple transactions to proceed without explicit locking. Before committing, it checks if the data has been modified since the transaction started. Pessimistic locking assumes conflicts are common and acquires locks on data before a transaction can access it, preventing other transactions from modifying the data. Choose optimistic locking when conflicts are rare, and performance is critical. Choose pessimistic locking when conflicts are frequent, and data consistency is paramount.",
+//       "explanation": "Optimistic locking is good for high-read, low-write scenarios, while pessimistic locking is better for scenarios where data integrity is crucial and collisions are frequent. Think about real-world examples to solidify your understanding."
+//     },
+//     {
+//       "question": "You're building a real-time collaborative document editor using React and Node.js with Express, storing document data in MongoDB. Describe how you would implement an efficient mechanism to handle concurrent edits to the same section of a document, minimizing conflicts and ensuring data consistency. Consider the technologies in your skill set (MongoDB, JavaScript, React, Node.js/Express).",
+//       "yourAnswer": "[object Object]",
+//       "correctAnswer": "Use operational transformation (OT) or conflict-free replicated data types (CRDTs) to handle concurrent edits. OT transforms operations to maintain consistency, while CRDTs ensure eventual consistency without explicit coordination. On the backend, use MongoDB's atomic operations (e.g., $push, $pull, $set) within a transaction with optimistic locking to apply changes. Use WebSockets for real-time communication between clients and the server. Debounce user input on the frontend to reduce the frequency of updates.",
+//       "explanation": "This is a complex system design problem. Understanding real-time collaboration strategies like OT/CRDTs is essential. Also, consider database-level features like atomic operations and transactions for handling concurrency safely."
+//     },
+//     {
+//       "question": "Given a singly linked list, describe an algorithm to detect if the list has a cycle. Can you do it with O(1) space complexity?",
+//       "yourAnswer": "[object Object]",
+//       "correctAnswer": "Use Floyd's cycle-finding algorithm (also known as the \"tortoise and hare\" algorithm). Have two pointers, one moving one step at a time (tortoise) and the other moving two steps at a time (hare). If there's a cycle, the hare will eventually meet the tortoise. If the hare reaches the end of the list (null), there's no cycle.",
+//       "explanation": "Floyd's algorithm is the standard solution for cycle detection in linked lists with O(1) space complexity. Make sure you can explain the algorithm and its time complexity."
+//     }
+//   ],
+//   "topicStats": [
+//     {
+//       "subject": "MongoDB",
+//       "score": 0
+//     },
+//     {
+//       "subject": "Data Structures (Linked Lists)",
+//       "score": 0
+//     },
+//     {
+//       "subject": "System Design",
+//       "score": 0
+//     },
+//     {
+//       "subject": "React",
+//       "score": 0
+//     },
+//     {
+//       "subject": "Node.js/Express",
+//       "score": 0
+//     }
+//   ],
+//   "feedbackBreakdown": [
+//     {
+//       "questionTitle": "MongoDB Concurrency",
+//       "score": 0,
+//       "whatWentWell": [],
+//       "whatWasMissing": [
+//         "Understanding of optimistic vs. pessimistic locking.",
+//         "Concrete examples of when to use each type of locking.",
+//         "Explaining practical differences in MongoDB."
+//       ],
+//       "howToImprove": [
+//         "Study MongoDB's documentation on concurrency control.",
+//         "Research real-world examples of using optimistic and pessimistic locking."
+//       ]
+//     },
+//     {
+//       "questionTitle": "Real-time Collaborative Editor",
+//       "score": 5,
+//       "whatWentWell": [],
+//       "whatWasMissing": [
+//         "Details on conflict resolution strategies (OT/CRDT).",
+//         "Implementation details for real-time communication (WebSockets).",
+//         "Backend implementation using MongoDB's atomic operations.",
+//         "Missing any details"
+//       ],
+//       "howToImprove": [
+//         "Research operational transformation (OT) and conflict-free replicated data types (CRDTs).",
+//         "Study real-time collaborative editing architectures.",
+//         "Practice implementing a basic real-time application using WebSockets and Node.js."
+//       ]
+//     },
+//     {
+//       "questionTitle": "Linked List Cycle Detection",
+//       "score": 5,
+//       "whatWentWell": [],
+//       "whatWasMissing": [
+//         "Implementation details on algorithm.",
+//         "Mention of Floyd's cycle-finding algorithm."
+//       ],
+//       "howToImprove": [
+//         "Practice implementing Floyd's cycle-finding algorithm from scratch.",
+//         "Understand the time and space complexity of the algorithm."
+//       ]
+//     },
+//     {
+//       "questionTitle": "E-commerce Product Search",
+//       "score": 5,
+//       "whatWentWell": [],
+//       "whatWasMissing": [
+//         "Failed to respond to the question"
+//       ],
+//       "howToImprove": [
+//         "Attempt the question, even if you are unsure of the answer"
+//       ]
+//     }
+//   ],
+//   "finalAdvice": "Bro you're close 🔥 just grind a bit more and you'll crush it!"
+// };  
+
+
+export default function AnalyticsTab({data}) {
   const {
     score,
     totalQuestions,

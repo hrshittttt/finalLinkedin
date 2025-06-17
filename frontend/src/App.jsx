@@ -3,8 +3,9 @@ import AnalyticsTab from "../components/JobLens/Analytics.jsx";
 import Login from "../components/Authentication/Login.jsx";
 import Signup from "../components/Authentication/Signup.jsx";
 import Profile from "../components/JobLens/LoginForm.jsx";
-import CompanyInterview from "../components/JobLens/CompanyBasedInterview.jsx";
-import ProfileInterview from "../components/JobLens/ProfileBasedInterview.jsx";
+import Interview from "../components/JobLens/Interview.jsx";
+import JobHome from "../components/JobLens/ProfileBasedInterview.jsx";
+
 
 const yourDataObject = {
   score: 68,
@@ -57,8 +58,12 @@ const yourDataObject = {
 export default function App() {
   return (
     <>
-      <Signup />
-      <Login />
+    {/* <AnalyticsTab /> */}
+    {/* <Signup /> */}
+    <Login />
+    {/* <Profile /> */}
+    {/* <Interview /> */}
+    <JobHome />
     </>
   );
 }
