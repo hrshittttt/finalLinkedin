@@ -3,40 +3,82 @@ const router = express.Router();
 const { db } = require("../firebaseConfig");
 const axios = require("axios");
 
-// ✅ Load API Key
+//  Load API Key
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-// ✅ Correct Gemini URL with working model
+// Correct Gemini URL with working model
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
-// ✅ Helper: Prompt Generator
-function createPrompt(profile, previousQuestions = [], difficulty = "medium") {
-  return `
-You're an expert AI technical interviewer.
 
-Profile:
-Name: ${profile.name}
-Skills: ${profile.skills.join(", ")}
-Experience: ${profile.experience}
-Interests: ${profile.interests.join(", ")}
+function createPrompt(profile, company = "", previousQuestions = [], difficulty = "medium") {
+  // If company is provided, use the dream company prompt
+  if (company) {
+    return `
+You're a professional AI interview expert helping a candidate prepare for their dream company: **${company}**.
 
-Ask one ${difficulty} difficulty interview question (theoretical or DSA-based).
-Avoid these repeated questions: ${previousQuestions.join(" || ")}
+ Candidate Profile:
+- Name: ${profile.name}
+- Skills: ${profile.skills.join(", ")}
+- Experience: ${profile.experience}
+- Interests: ${profile.interests.join(", ")}
 
-Format: Just return the question only, no explanations.
+Goal:
+Ask *one* ${difficulty} level **realistic** interview question based on **${company}**'s actual past interview patterns. The question should match the candidate’s skills and interests.
+
+Rules:
+- Pull from real interview data or closely mimic questions asked by ${company}.
+- Avoid repeating these questions: ${previousQuestions}.
+- The question can be theoretical (conceptual) or coding-based (DSA).
+- Ensure relevance to ${profile.skills.join(", ")}.
+- Keep the tone professional, exactly like ${company} interviews.
+
+ Format:
+Just return the interview question only. **No explanations, no intro, no formatting.**
 `;
+  }
+
+  // Fallback to the original prompt if no company is provided
+  return `
+You're an expert AI technical interviewer trained on the latest 2024–2025 software interview trends.
+
+ Candidate Profile:
+- Name: ${profile.name}
+- Skills: ${profile.skills.join(", ")}
+- Experience: ${profile.experience}
+- Interests: ${profile.interests.join(", ")}
+
+ Task:
+Ask **ONE** high-quality **${difficulty}** level interview question. It should be either:
+- A **conceptual/theoretical** question (for depth understanding), OR
+- A **DSA/coding** question (for problem-solving skills).
+
+Must follow:
+- Question should be **latest**, **relevant from 2015-2025**, and **commonly asked** in top tech companies and startups.
+- Must be related to the candidate's **skills & interests**.
+- Avoid **repeating** these questions: ${previousQuestions}.
+- Make it sound like a **real interview scenario** — natural and crisp.
+- Prefer **important core concepts**, trending topics (e.g., WebSockets, MongoDB indexing, React reconciliation, async JS, etc.), or **practical DSA problems**.
+
+ Format:
+Return ONLY the question text. No intro, no explanation, no notes.
+`
+;
 }
+
 
 // ✅ 1. START INTERVIEW
 router.post("/start", async (req, res) => {
-  const { uid, difficulty } = req.body;
+  const { uid, difficulty, comp } = req.body;
 
   try {
     const userDoc = await db.collection("profiles").doc(uid).get();
     if (!userDoc.exists) return res.status(404).json({ error: "Profile not found" });
 
     const profile = userDoc.data();
-    const prompt = createPrompt(profile, [], difficulty);
+    if(comp){
+      company = profile.dreamCompanies || "";
+    }
+    const prompt = createPrompt(profile, company,[], difficulty);
 
     const aiRes = await axios.post(
       GEMINI_URL,
