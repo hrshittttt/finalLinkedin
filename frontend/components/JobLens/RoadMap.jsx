@@ -22,6 +22,7 @@ import {
   SiTailwindcss,
   SiNextdotjs,
 } from "react-icons/si";
+
 const iconMap = {
   html: <FaHtml5 className="text-orange-500 text-3xl" />,
   css: <FaCss3Alt className="text-blue-500 text-3xl" />,
@@ -35,9 +36,6 @@ const iconMap = {
   next: <SiNextdotjs className="text-white text-3xl" />,
 };
 
-
-
-
 export default function Roadmap() {
   const [roadmapItems, setRoadmapItems] = useState([]);
   const [active, setActive] = useState(null);
@@ -45,32 +43,25 @@ export default function Roadmap() {
   const [fadeOut, setFadeOut] = useState(false);
 
   const uid = localStorage.getItem("uid");
-  
 
   useEffect(() => {
     const fetchRoadmap = async () => {
-
       try {
         const res = await axios.post("http://localhost:4000/roadmap/generate", {
           uid,
         });
         setIsLoading(false);
-        setFadeOut(true)
-
-
+        setFadeOut(true);
 
         let raw = res.data.roadmap;
+        if (raw.startsWith("```json")) {
+          raw = raw
+            .replace(/^```json/, "")
+            .replace(/```$/, "")
+            .trim();
+        }
 
-    
-    if (raw.startsWith("```json")) {
-      raw = raw.replace(/^```json/, "").replace(/```$/, "").trim();
-    }
-
-   
-    const roadmapArray = JSON.parse(raw);
-    console.log(roadmapArray)
-
-
+        const roadmapArray = JSON.parse(raw);
         setRoadmapItems(roadmapArray);
       } catch (err) {
         console.error("Error fetching roadmap:", err.message);
@@ -78,41 +69,15 @@ export default function Roadmap() {
     };
 
     fetchRoadmap();
-    // const fadeTimer = setTimeout(() => setFadeOut(true), 1200);
-    // // const timer = setTimeout(() => setIsLoading(false), 1500);
-    // return () => {
-    //   clearTimeout(fadeTimer);
-    //   clearTimeout(timer);
-    // };
   }, [uid]);
 
-  
-  function parseRoadmapText(text) {
-    const lines = text.split("\n").filter((line) => line.trim() !== "");
-    let id = 1;
-    const items = [];
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      const match = line.match(/^\d+\.\s*(.+?)\s*-\s*(.+)$/); // 1. HTML - 1 week
-      if (match) {
-        const title = match[1].trim();
-        const time = match[2].trim();
-        const details = lines[i + 1]?.trim() || "";
-        const iconKey = title.toLowerCase().split(" ")[0];
-        items.push({
-          id: id++,
-          title,
-          time,
-          details,
-          icon: iconMap[iconKey] || <FaJs className="text-gray-400 text-3xl" />,
-        });
-        i++; 
-      }
-    }
-
-    return items;
-  }
+  const curveHeight = roadmapItems.length * 180 + 100;
+  const curvePath = Array.from({ length: roadmapItems.length }, (_, i) => {
+    const y = (i + 1) * 200;
+    const cx = i % 2 === 0 ? 100 : 200;
+    return `Q${cx} ${y - 100}, 150 ${y}`;
+  }).join(" ");
+  const fullPath = `M150 0 ${curvePath}`;
 
   return (
     <>
@@ -152,19 +117,26 @@ export default function Roadmap() {
             />
 
             <div className="relative md:w-1/2 flex items-start justify-center pt-10">
-              <svg viewBox="0 0 300 1800" className="absolute h-[1800px] w-auto">
+              <svg
+                viewBox={`0 0 300 ${curveHeight}`}
+                className="absolute"
+                style={{ height: curveHeight }}
+              >
                 <path
-                  d="M150 0 Q100 100 150 200 Q200 300 150 400 Q100 500 150 600 Q200 700 150 800 Q100 900 150 1000 Q200 1100 150 1200 Q100 1300 150 1400 Q200 1500 150 1600 Q100 1700 150 1800"
+                  d={fullPath}
                   stroke="#60A5FA"
                   strokeWidth="4"
                   fill="none"
                 />
-                <text x="140" y="1815" fill="#60A5FA" fontSize="24">
+                <text x="140" y={curveHeight - 10} fill="#60A5FA" fontSize="24">
                   ▶
                 </text>
               </svg>
 
-              <div className="absolute top-0 left-36 h-[1800px] w-full">
+              <div
+                className="absolute top-0 left-36 w-full"
+                style={{ height: curveHeight }}
+              >
                 {roadmapItems.map((item, index) => {
                   const isLeft = index % 2 !== 0;
                   const xOffset = 120;
@@ -176,7 +148,9 @@ export default function Roadmap() {
                       onMouseEnter={() => setActive(item.id)}
                       onMouseLeave={() => setActive(null)}
                       className={`absolute -translate-y-1/2 text-center cursor-pointer transition-opacity duration-300 ${
-                        active && active !== item.id ? "opacity-30" : "opacity-100"
+                        active && active !== item.id
+                          ? "opacity-30"
+                          : "opacity-100"
                       }`}
                       style={{
                         top: `${index * 180 + 60}px`,
@@ -188,8 +162,12 @@ export default function Roadmap() {
                       transition={{ duration: 0.2 }}
                     >
                       <div className="flex flex-col items-center gap-1">
-                        {item.icon}
-                        <div className="text-white font-semibold text-sm">{item.title}</div>
+                        {iconMap[item.iconKey] || (
+                          <FaJs className="text-gray-400 text-3xl" />
+                        )}
+                        <div className="text-white font-semibold text-sm">
+                          {item.title}
+                        </div>
                         <div className="text-xs text-gray-300">{item.time}</div>
                       </div>
                     </motion.div>
@@ -208,8 +186,13 @@ export default function Roadmap() {
                   className="space-y-6 text-white"
                 >
                   <h2 className="text-2xl font-bold flex items-center gap-2">
-                    {roadmapItems.find((item) => item.id === active)?.icon}
-                    {roadmapItems.find((item) => item.id === active)?.title} Guide
+                    {
+                      iconMap[
+                        roadmapItems.find((item) => item.id === active)?.iconKey
+                      ]
+                    }
+                    {roadmapItems.find((item) => item.id === active)?.title}{" "}
+                    Guide
                   </h2>
                   <p className="text-gray-300">
                     {roadmapItems.find((item) => item.id === active)?.details}
@@ -251,21 +234,25 @@ export default function Roadmap() {
               ) : (
                 <div className="text-gray-400 text-left space-y-4">
                   <h2 className="text-2xl font-bold flex items-center gap-2">
-                    <FaMapSigns className="text-teal-400" /> Welcome to Your Web Dev Journey!
+                    <FaMapSigns className="text-teal-400" /> Welcome to Your Web
+                    Dev Journey!
                   </h2>
                   <p className="flex items-center gap-2">
-                    <FaCompass className="text-yellow-300" /> Hover over any technology on the
-                    left to explore learning guides.
+                    <FaCompass className="text-yellow-300" /> Hover over any
+                    technology on the left to explore learning guides.
                   </p>
                   <ul className="list-disc list-inside text-sm space-y-1">
                     <li className="flex items-center gap-2">
-                      <FaLaptopCode className="text-green-400" /> Explore from HTML to Next.js
+                      <FaLaptopCode className="text-green-400" /> Explore from
+                      HTML to Next.js
                     </li>
                     <li className="flex items-center gap-2">
-                      <FaBook className="text-blue-300" /> Get focused study tips
+                      <FaBook className="text-blue-300" /> Get focused study
+                      tips
                     </li>
                     <li className="flex items-center gap-2">
-                      <FaRocket className="text-pink-400" /> Access resources and next steps
+                      <FaRocket className="text-pink-400" /> Access resources
+                      and next steps
                     </li>
                   </ul>
                 </div>
