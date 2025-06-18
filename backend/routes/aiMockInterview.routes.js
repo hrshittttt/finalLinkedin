@@ -252,4 +252,24 @@ console.log(questions, answers);
 });
 
 
+// POST /interview/skip
+router.post("/skip", async (req, res) => {
+  const { uid, sessionId } = req.body;
+  const sessionRef = doc(db, "interviews", sessionId);
+  const sessionSnap = await getDoc(sessionRef);
+
+  if (!sessionSnap.exists()) return res.status(404).json({ error: "Session not found" });
+
+  const sessionData = sessionSnap.data();
+  const nextQuestion = await getNextQuestion(sessionData); // however you're generating questions
+
+  await updateDoc(sessionRef, {
+    history: arrayUnion({ question: nextQuestion, answer: "" }), // store empty answer
+    lastUpdated: Date.now(),
+  });
+
+  return res.json({ question: nextQuestion });
+});
+
+
 module.exports = router;
