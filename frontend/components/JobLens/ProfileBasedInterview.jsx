@@ -10,13 +10,13 @@ export default function ProfileInterview() {
   const [answer, setAnswer] = useState("");
   const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [sending, setSending] = useState(false); // 🔥 For Next button
+  const [submitting, setSubmitting] = useState(false); // 🔥 For End Interview
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
   const [sessionId, setSessionId] = useState(null);
   const [feedback, setFeedback] = useState(false);
   const [feedbackData, setFeedbackData] = useState("");
-
 
   const uid = localStorage.getItem("uid");
   const token = localStorage.getItem("token");
@@ -27,6 +27,7 @@ export default function ProfileInterview() {
       const res = await axios.post(`http://localhost:4000/interview/start`, {
         uid,
         difficulty: "medium",
+        company: false,
       });
 
       setQuestion(res.data.question);
@@ -41,64 +42,78 @@ export default function ProfileInterview() {
     }
   };
 
-
   const sendAnswer = async () => {
-      if (!answer.trim()) {
-        setError("Answer cannot be empty");
-        return;
-      }
-  
-      setSubmitting(true);
-      setError("");
-  
-      try {
+    setSending(true);
+    setError("");
+
+    try {
+      let newQuestion;
+
+      if (answer.trim()) {
+        // ✅ If answer exists, send to backend
         const res = await axios.post(`http://localhost:4000/interview/answer`, {
           uid,
           sessionId,
           answer,
         });
-  
+        newQuestion = res.data.question;
         setAnswers((prev) => [...prev, answer]);
-        setAnswer("");
-        setQuestion(res.data.question);
-        setCurrentIndex((i) => i + 1);
-
-      } catch (err) {
-        console.error("Answer error:", err.response?.data || err.message);
-        setError("Failed to send answer");
-      } finally {
-        setSubmitting(false);
+      } else {
+        // ✅ If answer empty, skip sending but still fetch next question
+        const res = await axios.post(`http://localhost:4000/interview/skip`, {
+          uid,
+          sessionId,
+        });
+        newQuestion = res.data.question;
+        setAnswers((prev) => [...prev, ""]); // Empty string to maintain index alignment
       }
-    };
 
-
-   const endInterview = async () => {
-      setFeedbackData("");
-      
-    try {
-       const res = await axios.post(`http://localhost:4000/interview/end`, {
-        uid,
-        sessionId,
-      });
-      setSubmitted(false);
-      setFeedback(true);
-      setFeedbackData(res.data.feedback);
-      
-
-      
-
-  
-      alert("Interview ended! Feedback logged in console.");
-      
+      setAnswer(""); // Always clear after
+      setQuestion(newQuestion);
+      setCurrentIndex((i) => i + 1);
     } catch (err) {
-      console.error("End error:", err.response?.data || err.message);
-      setError("Failed to end interview");
+      console.error("Answer error:", err.response?.data || err.message);
+      setError("Failed to send answer");
+    } finally {
+      setSending(false);
     }
   };
 
+  const endInterview = async () => {
+    setSubmitting(true);
+    setFeedbackData("");
+
+    try {
+      // ✅ Submit last unsent answer (if not empty and not already saved)
+      if (answer.trim() && answers.length === currentIndex) {
+        await axios.post(`http://localhost:4000/interview/answer`, {
+          uid,
+          sessionId,
+          answer,
+        });
+        setAnswers((prev) => [...prev, answer]);
+        setAnswer(""); // Clear after saving
+      }
+
+      // ✅ Now end the interview
+      const res = await axios.post(`http://localhost:4000/interview/end`, {
+        uid,
+        sessionId,
+      });
+
+      setSubmitted(false);
+      setFeedback(true);
+      setFeedbackData(res.data.feedback);
+    } catch (err) {
+      console.error("End error:", err.response?.data || err.message);
+      setError("Failed to end interview");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const buttonBase =
-    "w-[100px] h-9 px-3 py-1.5 rounded text-white text-sm flex items-center justify-center gap-1";
+    "w-[150px] h-9 px-3 py-1.5 rounded text-white text-sm flex items-center justify-center gap-1";
 
   if (submitted) {
     return (
@@ -116,11 +131,10 @@ export default function ProfileInterview() {
       </div>
     );
   }
+
   if (feedback) {
     return <AnalyticsTab response={feedbackData} />;
   }
-
-
 
   return (
     <>
@@ -137,7 +151,7 @@ export default function ProfileInterview() {
           </h1>
         </div>
 
-        {/* Main Content */}
+        {/* Main Box */}
         <div className="w-full max-w-5xl h-[500px] border border-linkedin-border bg-linkedin-bg text-linkedin-text rounded-xl overflow-hidden flex">
           {loading ? (
             <div className="w-full flex flex-col items-center justify-center gap-3">
@@ -189,16 +203,25 @@ export default function ProfileInterview() {
 
               {/* Right Panel - Answer */}
               <div className="w-1/2 p-6 flex flex-col justify-between relative">
-                {/* Top Buttons */}
+                {/* Top Button - Next */}
                 <div className="absolute top-4 right-6 flex gap-2">
-                 
-
                   <button
                     type="button"
-                    className={`${buttonBase} bg-linkedin-blue hover:bg-linkedin-hover-blue`}
+                    className={`${buttonBase} ${
+                      sending
+                        ? "bg-linkedin-muted cursor-wait"
+                        : "bg-linkedin-blue hover:bg-linkedin-hover-blue"
+                    }`}
                     onClick={sendAnswer}
+                    disabled={sending}
                   >
-                    Next Question<FaArrowRight />
+                    {sending ? (
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        Next Question <FaArrowRight />
+                      </>
+                    )}
                   </button>
                 </div>
 
@@ -215,7 +238,7 @@ export default function ProfileInterview() {
                   )}
                 </div>
 
-                {/* Bottom Submit Button */}
+                {/* Bottom Button - End Interview */}
                 <div className="flex justify-end mt-4">
                   <button
                     type="button"

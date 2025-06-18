@@ -10,7 +10,7 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 
-function createPrompt(profile, company = "", previousQuestions = [], difficulty = "medium") {
+function createPrompt(profile, company, previousQuestions = [], difficulty = "medium") {
   // If company is provided, use the dream company prompt
   if (company) {
     return `
@@ -68,17 +68,18 @@ Return ONLY the question text. No intro, no explanation, no notes.
 
 // ✅ 1. START INTERVIEW
 router.post("/start", async (req, res) => {
-  const { uid, difficulty, comp } = req.body;
+  const { uid, difficulty, company } = req.body;
 
+  console.log(uid, difficulty, company);
   try {
     const userDoc = await db.collection("profiles").doc(uid).get();
     if (!userDoc.exists) return res.status(404).json({ error: "Profile not found" });
 
     const profile = userDoc.data();
-    if(comp){
+    if(company){
       company = profile.dreamCompanies || "";
     }
-    const prompt = createPrompt(profile, company,[], difficulty);
+    const prompt = createPrompt(profile, company, [], difficulty);
 
     const aiRes = await axios.post(
       GEMINI_URL,
@@ -185,7 +186,7 @@ ${questions.map((q, i) =>`Q${i + 1}: ${q}\nA${i + 1}: ${answers[i] ? JSON.string
  JSON Structure:
 {
   score: 24,
-  totalQuestions: 3,
+  totalQuestions: 3-1,
   correctAnswers: 2,
   wrongAnswers: 1,
   improvementTips: ["tips1", "tips2", "tips3"], (in 5-10 words based on answers)
