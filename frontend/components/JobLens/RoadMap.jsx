@@ -23,17 +23,18 @@ import {
   SiNextdotjs,
 } from "react-icons/si";
 
+// ✅ Icon map for backend reference: send iconKey like "html", "react", etc.
 const iconMap = {
-  html: <FaHtml5 className="text-orange-500 text-3xl" />,
-  css: <FaCss3Alt className="text-blue-500 text-3xl" />,
-  javascript: <FaJs className="text-yellow-400 text-3xl" />,
-  react: <FaReact className="text-cyan-400 text-3xl" />,
-  redux: <SiRedux className="text-purple-500 text-3xl" />,
-  typescript: <SiTypescript className="text-blue-700 text-3xl" />,
-  tailwind: <SiTailwindcss className="text-sky-400 text-3xl" />,
-  node: <FaNodeJs className="text-green-500 text-3xl" />,
-  mongodb: <SiMongodb className="text-green-700 text-3xl" />,
-  next: <SiNextdotjs className="text-white text-3xl" />,
+  html: FaHtml5,
+  css: FaCss3Alt,
+  javascript: FaJs,
+  react: FaReact,
+  redux: SiRedux,
+  typescript: SiTypescript,
+  tailwind: SiTailwindcss,
+  node: FaNodeJs,
+  mongodb: SiMongodb,
+  next: SiNextdotjs,
 };
 
 export default function Roadmap() {
@@ -71,6 +72,7 @@ export default function Roadmap() {
     fetchRoadmap();
   }, [uid]);
 
+  // ✅ Dynamic height and path generation for curved SVG based on number of roadmap items
   const curveHeight = roadmapItems.length * 180 + 100;
   const curvePath = Array.from({ length: roadmapItems.length }, (_, i) => {
     const y = (i + 1) * 200;
@@ -102,7 +104,7 @@ export default function Roadmap() {
           </motion.div>
         ) : (
           <motion.div
-            className="flex flex-col md:flex-row w-full p-6 bg-linkedin-card overflow-y-scroll h-screen"
+            className="flex flex-col md:flex-row w-full p-6 bg-linkedin-card h-screen overflow-hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6 }}
@@ -116,7 +118,7 @@ export default function Roadmap() {
               transition={{ duration: 0.6, delay: 0.2 }}
             />
 
-            <div className="relative md:w-1/2 flex items-start justify-center pt-10">
+            <div className="relative md:w-1/2 flex items-start justify-center pt-10 overflow-y-scroll h-screen">
               <svg
                 viewBox={`0 0 300 ${curveHeight}`}
                 className="absolute"
@@ -142,6 +144,10 @@ export default function Roadmap() {
                   const xOffset = 120;
                   const isActive = active === null || active === item.id;
 
+                  // ✅ Rendering icon from iconMap using iconKey sent by backend
+                  const IconComponent =
+                    iconMap[item.iconKey?.toLowerCase()] || FaJs;
+
                   return (
                     <motion.div
                       key={item.id}
@@ -162,9 +168,7 @@ export default function Roadmap() {
                       transition={{ duration: 0.2 }}
                     >
                       <div className="flex flex-col items-center gap-1">
-                        {iconMap[item.iconKey] || (
-                          <FaJs className="text-gray-400 text-3xl" />
-                        )}
+                        <IconComponent className="text-3xl" />
                         <div className="text-white font-semibold text-sm">
                           {item.title}
                         </div>
@@ -176,7 +180,8 @@ export default function Roadmap() {
               </div>
             </div>
 
-            <div className="md:w-1/2 p-6 sticky h-screen bg-linkedin-bg rounded-2xl shadow-inner overflow-y-auto">
+            {/* ✅ Sticky container on the right side */}
+            <div className="md:w-1/2 p-6 sticky top-0 h-screen bg-linkedin-bg rounded-2xl shadow-inner overflow-y-auto">
               {active ? (
                 <motion.div
                   key={active}
@@ -186,48 +191,64 @@ export default function Roadmap() {
                   className="space-y-6 text-white"
                 >
                   <h2 className="text-2xl font-bold flex items-center gap-2">
-                    {
-                      iconMap[
-                        roadmapItems.find((item) => item.id === active)?.iconKey
-                      ]
-                    }
+                    {(() => {
+                      const Icon =
+                        iconMap[
+                          roadmapItems
+                            .find((item) => item.id === active)
+                            ?.iconKey?.toLowerCase()
+                        ] || FaJs;
+                      return <Icon className="text-3xl" />;
+                    })()}
                     {roadmapItems.find((item) => item.id === active)?.title}{" "}
                     Guide
                   </h2>
                   <p className="text-gray-300">
                     {roadmapItems.find((item) => item.id === active)?.details}
                   </p>
+
+                  {/* ✅ Focus points sent by backend as array */}
                   <div className="space-y-2">
                     <h3 className="text-xl font-semibold flex items-center gap-2">
                       <FaLightbulb className="text-yellow-300" />
                       What to Focus On
                     </h3>
                     <ul className="list-disc list-inside text-sm text-gray-300">
-                      <li>Conceptual clarity</li>
-                      <li>Hands-on practice</li>
-                      <li>Project implementation</li>
+                      {roadmapItems
+                        .find((item) => item.id === active)
+                        ?.focus?.map((point, i) => (
+                          <li key={i}>{point}</li>
+                        ))}
                     </ul>
                   </div>
+
+                  {/* ✅ Resource links or titles from backend */}
                   <div className="space-y-2">
                     <h3 className="text-xl font-semibold flex items-center gap-2">
                       <FaBook className="text-blue-300" />
                       Resources
                     </h3>
                     <ul className="list-disc list-inside text-sm text-gray-300">
-                      <li>Official Documentation</li>
-                      <li>YouTube Crash Courses</li>
-                      <li>CodeSandbox, LeetCode, Frontend Mentor</li>
+                      {roadmapItems
+                        .find((item) => item.id === active)
+                        ?.resources?.map((resource, i) => (
+                          <li key={i}>{resource}</li>
+                        ))}
                     </ul>
                   </div>
+
+                  {/* ✅ Next steps: these should also be an array sent from backend */}
                   <div className="space-y-2">
                     <h3 className="text-xl font-semibold flex items-center gap-2">
                       <FaRocket className="text-pink-400" />
                       Next Steps
                     </h3>
                     <ul className="list-disc list-inside text-sm text-gray-300">
-                      <li>Build mini-projects</li>
-                      <li>Write notes or blog summaries</li>
-                      <li>Revise and connect with peers</li>
+                      {roadmapItems
+                        .find((item) => item.id === active)
+                        ?.nextSteps?.map((step, i) => (
+                          <li key={i}>{step}</li>
+                        ))}
                     </ul>
                   </div>
                 </motion.div>
