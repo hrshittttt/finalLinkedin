@@ -210,7 +210,7 @@ export default function Roadmap() {
               </div>
             </div>
 
-            <div className="relative md:w-1/2 p-6 sticky top-0 h-screen bg-linkedin-bg rounded-2xl shadow-inner overflow-y-auto">
+            <div className="md:w-1/2 p-6 sticky h-screen bg-linkedin-bg rounded-2xl shadow-inner overflow-y-auto">
               {active ? (
                 <motion.div
                   key={active}
