@@ -189,51 +189,51 @@ export default function LinkedInForm() {
     setStep((s) => s - 1);
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  if (!validateStep()) return;
+    if (!validateStep()) return;
 
-  const token = localStorage.getItem("token");
-  const uid = localStorage.getItem("uid");
+    const token = localStorage.getItem("token");
+    const uid = localStorage.getItem("uid");
 
-  const profileData = {
-    uid,
-    name,
-    skills: selectedSkills,
-    experience: experiences,
-    location,
-    education,
-    dreamCompanies: [targetCompany],
-    resumeUrl: "ihtisrhfkih",
-    githubURL: gitUrl,
+    const profileData = {
+      uid,
+      name,
+      skills: selectedSkills,
+      experience: experiences,
+      location,
+      education,
+      dreamCompanies: [targetCompany],
+      resumeUrl: "ihtisrhfkih",
+      githubURL: gitUrl,
+    };
+
+    try {
+      const res = await axios.post(
+        "http://localhost:4000/profile/update",
+        profileData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("Backend Response:", res.data); // "Profile updated successfully"
+
+      alert(" Profile updated successfully!");
+    } catch (err) {
+      console.error("Profile update error:", err.response?.data || err.message);
+      alert(err.response?.data?.error || "Something went wrong!");
+    }
   };
-
-  try {
-    const res = await axios.post(
-      "http://localhost:4000/profile/update",
-      profileData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    console.log("Backend Response:", res.data); // "Profile updated successfully" 
-
-    alert(" Profile updated successfully!");
-  } catch (err) {
-    console.error("Profile update error:", err.response?.data || err.message);
-    alert(err.response?.data?.error || "Something went wrong!");
-  }
-};
   const inputClass =
     "w-full h-10 py-3 pl-3 bg-linkedin-bg text-linkedin-text text-lg border border-linkedin-border rounded-md placeholder-transparent focus:outline-none focus:ring-2 focus:ring-linkedin-blue";
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-linkedin-bg px-4">
+    <div className="flex items-center justify-center min-h-screen bg-linkedin-card px-4">
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-md bg-linkedin-bg border border-linkedin-border text-linkedin-text shadow-md rounded-xl p-6"
