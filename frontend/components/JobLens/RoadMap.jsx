@@ -2,11 +2,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  FaHtml5,
-  FaCss3Alt,
-  FaJs,
-  FaReact,
-  FaNodeJs,
   FaLightbulb,
   FaBook,
   FaRocket,
@@ -14,29 +9,17 @@ import {
   FaCompass,
   FaLaptopCode,
   FaHome,
+  FaJs,
+  FaSpinner,
 } from "react-icons/fa";
-import {
-  SiMongodb,
-  SiRedux,
-  SiTypescript,
-  SiTailwindcss,
-  SiNextdotjs,
-} from "react-icons/si";
-import { FaSpinner } from "react-icons/fa";
+import * as FAIcons from "react-icons/fa";
+import * as SIIcons from "react-icons/si";
 
-// ✅ Icon map using react-icons components
-const iconMap = {
-  html: FaHtml5,
-  css: FaCss3Alt,
-  javascript: FaJs,
-  react: FaReact,
-  redux: SiRedux,
-  typescript: SiTypescript,
-  tailwind: SiTailwindcss,
-  node: FaNodeJs,
-  mongodb: SiMongodb,
-  next: SiNextdotjs,
-};
+function getIconComponent(iconKey) {
+  if (!iconKey) return FaJs;
+  const key = iconKey.charAt(0).toUpperCase() + iconKey.slice(1);
+  return SIIcons[`Si${key}`] || FAIcons[`Fa${key}`] || FaJs;
+}
 
 export default function Roadmap() {
   const [roadmapItems, setRoadmapItems] = useState([]);
@@ -87,26 +70,26 @@ export default function Roadmap() {
       <AnimatePresence>
         {isLoading ? (
           <motion.div
-            className="relative flex flex-col gap-4 items-center justify-center h-screen w-screen bg-linkedin-card text-white overflow-hidden"
+            className="relative flex items-center justify-center h-screen w-screen bg-linkedin-card text-white overflow-hidden"
             initial={{ opacity: 1 }}
             animate={{ opacity: fadeOut ? 0 : 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
           >
             <div className="absolute w-80 h-80 bg-blue-500 opacity-30 blur-[100px] rounded-full z-0" />
-            <FaSpinner className="animate-spin text-4xl text-white z-10" />
             <motion.p
-              className="relative z-10 text-2xl font-semibold text-center"
+              className="relative z-10 text-2xl font-semibold text-center flex items-center gap-3"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8 }}
             >
+              <FaSpinner className="animate-spin text-white text-xl" />
               Crafting your personalized roadmap...
             </motion.p>
           </motion.div>
         ) : (
           <motion.div
-            className="flex flex-col md:flex-row w-full p-6 bg-linkedin-card h-screen overflow-y-auto scrollbar-hide"
+            className="flex flex-col md:flex-row w-full p-6 bg-linkedin-card overflow-y-auto h-screen scrollbar-hide"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6 }}
@@ -120,12 +103,11 @@ export default function Roadmap() {
               transition={{ duration: 0.6, delay: 0.2 }}
             />
 
-            {/* Left Curve/Icons Panel */}
             <div className="relative md:w-3/5 flex items-start justify-center pt-10">
               <svg
                 viewBox={`0 0 300 ${curveHeight}`}
                 className="absolute"
-                style={{ height: curveHeight, overflow: "visible" }}
+                style={{ height: curveHeight }}
               >
                 <path
                   d={fullPath}
@@ -146,8 +128,8 @@ export default function Roadmap() {
                   const isLeft = index % 2 !== 0;
                   const xOffset = 120;
                   const isActive = active === null || active === item.id;
-                  const IconComponent =
-                    iconMap[item.iconKey?.toLowerCase()] || FaJs;
+
+                  const Icon = getIconComponent(item.iconKey);
 
                   return (
                     <motion.div
@@ -156,6 +138,7 @@ export default function Roadmap() {
                         setActive(item.id);
                         setLastActive(item.id);
                       }}
+                      onMouseLeave={() => setActive(null)}
                       className={`absolute -translate-y-1/2 text-center cursor-pointer transition-opacity duration-300 ${
                         active && active !== item.id
                           ? "opacity-30"
@@ -171,7 +154,7 @@ export default function Roadmap() {
                       transition={{ duration: 0.2 }}
                     >
                       <div className="flex flex-col items-center gap-1">
-                        <IconComponent className="text-3xl" />
+                        <Icon className="text-3xl" />
                         <div className="text-white font-semibold text-sm">
                           {item.title}
                         </div>
@@ -183,8 +166,7 @@ export default function Roadmap() {
               </div>
             </div>
 
-            {/* Sticky and vertically centered Right Side Box */}
-            <div className="md:w-2/5 h-[80vh] sticky top-[10vh] self-center bg-linkedin-bg rounded-2xl shadow-inner overflow-y-auto p-6">
+            <div className="md:w-2/5 p-6 bg-linkedin-bg rounded-2xl shadow-inner overflow-y-auto self-center sticky top-[10vh] h-auto">
               {lastActive ? (
                 <motion.div
                   key={lastActive}
@@ -194,15 +176,10 @@ export default function Roadmap() {
                   className="space-y-6 text-white"
                 >
                   <h2 className="text-2xl font-bold flex items-center gap-2">
-                    {(() => {
-                      const Icon =
-                        iconMap[
-                          roadmapItems
-                            .find((item) => item.id === lastActive)
-                            ?.iconKey?.toLowerCase()
-                        ] || FaJs;
-                      return <Icon className="text-3xl" />;
-                    })()}
+                    {getIconComponent(
+                      roadmapItems.find((item) => item.id === lastActive)
+                        ?.iconKey
+                    )}
                     {roadmapItems.find((item) => item.id === lastActive)?.title}{" "}
                     Guide
                   </h2>
@@ -212,46 +189,46 @@ export default function Roadmap() {
                         ?.details
                     }
                   </p>
-
                   <div className="space-y-2">
                     <h3 className="text-xl font-semibold flex items-center gap-2">
                       <FaLightbulb className="text-yellow-300" />
                       What to Focus On
                     </h3>
                     <ul className="list-disc list-inside text-sm text-gray-300">
-                      {roadmapItems
-                        .find((item) => item.id === lastActive)
-                        ?.focus?.map((point, i) => (
-                          <li key={i}>{point}</li>
-                        ))}
+                      {(
+                        roadmapItems.find((item) => item.id === lastActive)
+                          ?.focus || []
+                      ).map((point, idx) => (
+                        <li key={idx}>{point}</li>
+                      ))}
                     </ul>
                   </div>
-
                   <div className="space-y-2">
                     <h3 className="text-xl font-semibold flex items-center gap-2">
                       <FaBook className="text-blue-300" />
                       Resources
                     </h3>
                     <ul className="list-disc list-inside text-sm text-gray-300">
-                      {roadmapItems
-                        .find((item) => item.id === lastActive)
-                        ?.resources?.map((resource, i) => (
-                          <li key={i}>{resource}</li>
-                        ))}
+                      {(
+                        roadmapItems.find((item) => item.id === lastActive)
+                          ?.resources || []
+                      ).map((point, idx) => (
+                        <li key={idx}>{point}</li>
+                      ))}
                     </ul>
                   </div>
-
                   <div className="space-y-2">
                     <h3 className="text-xl font-semibold flex items-center gap-2">
                       <FaRocket className="text-pink-400" />
                       Next Steps
                     </h3>
                     <ul className="list-disc list-inside text-sm text-gray-300">
-                      {roadmapItems
-                        .find((item) => item.id === lastActive)
-                        ?.nextSteps?.map((step, i) => (
-                          <li key={i}>{step}</li>
-                        ))}
+                      {(
+                        roadmapItems.find((item) => item.id === lastActive)
+                          ?.nextSteps || []
+                      ).map((point, idx) => (
+                        <li key={idx}>{point}</li>
+                      ))}
                     </ul>
                   </div>
                 </motion.div>
