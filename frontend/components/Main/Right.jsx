@@ -27,7 +27,7 @@ export default function Right() {
 
       <div className="w-auto sm:w-[300px] mt-5 bg-linkedin-bg rounded-lg relative left-[206px] top-2 border border-linkedin-border p-4">
         <h2 className="text-white text-lg font-bold mb-4">Add to your feed</h2>
-        <div className="flex items-center gap-3 mb-3">
+        <div className="flex items-start gap-3 mb-3">
           <div className="w-10 h-10 rounded-full bg-gray-500"></div>
           <div className="flex flex-col text-white text-sm">
             <span>#ReactJS</span>
