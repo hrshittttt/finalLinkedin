@@ -30,7 +30,7 @@ export default function Right() {
       title: "Job Roadmaps",
       icon: faMap,
       text: "Choosing a career path is confusing — there are too many resources, tools, and learning tracks out there. Our Job Roadmaps solve that. We offer structured, step-by-step guides tailored to different tech career goals like Frontend Developer, Backend Developer, Data Analyst, and more. Each roadmap outlines what to learn, when to learn it, what tools to master, and what projects to build — all in a well-organized, progressive format. These roadmaps are like GPS for your career — they keep you focused, eliminate guesswork, and ensure you build the right skills in the right order to land your desired job confidently.",
-      path: "/",
+      path: "/roadmap",
     },
   ];
 
