@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../src/assets/firebase";
+import { Link , useNavigate } from "react-router-dom";
+
 
 export default function Login() {
   const [mail, setMail] = useState("");
   const [pass, setPass] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,7 +29,10 @@ export default function Login() {
 
       localStorage.setItem("token", idToken);
       localStorage.setItem("uid", userCredential.user.uid);
-      alert("✅ Login successful!");
+
+
+      navigate("/");
+      window.location.reload();
     } catch (error) {
       console.error("Login Failed:", error.message);
       alert(error.message);
@@ -33,6 +40,7 @@ export default function Login() {
       setLoading(false);
     }
   };
+  
 
   return (
     <>
@@ -134,9 +142,9 @@ export default function Login() {
 
           <span className="cursor-default text-linkedin-text">
             New to LinkedIn? Make an account{" "}
-            <a className="text-linkedin-blue cursor-pointer underline" href="#">
-              here
-            </a>
+            
+            <Link className="text-linkedin-blue cursor-pointer underline"  to="/signup">here</Link>
+
           </span>
         </form>
       </div>
