@@ -10,6 +10,7 @@ const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemi
 // POST /roadmap/generate
 router.post("/generate", async (req, res) => {
   const { uid } = req.body;
+  
 
   try {
     //  user dundhega from firebasd
@@ -31,14 +32,30 @@ A student named ${name} has the following profile:
 - Interests: ${interests.join(", ") || ""}
 - Dream Company: ${dreamCompany}
 
-🎯 Generate a complete roadmap (from beginner to pro) tailored for cracking ${dreamCompany}, covering:
-- Must-have skills 🔧
-- Key projects to build 💻
-- Top resources (free + paid) 📚
-- Timeline breakdown (e.g., Month 1: ..., Month 2: ...)
-- Important interview topics asked by ${dreamCompany} 👨‍💻
+🎯 Generate a complete web development roadmap tailored to help the student crack ${dreamCompany}. Format it strictly as a JSON array of objects with the following fields only:
 
-Keep it motivating, clear, and step-by-step. Format neatly.
+- "title": the name of the skill or topic (e.g., "HTML")
+- "time": how long to spend on it (e.g., "1 week", "2-3 weeks")
+- "details": a short motivating and clear explanation of what to learn and do
+
+⚠️ Example Output (format exactly like this, in raw JSON format): even need id too 
+
+[
+  {
+    "id": "1",
+    "title": "HTML",
+    "time": "1 week",
+    "details": "Learn HTML tags, structure, semantic elements, and forms. Focus on accessibility and SEO basics."
+  },
+  {
+    "id": "2",
+    "title": "CSS",
+    "time": "1-2 weeks",
+    "details": "Master Flexbox, Grid, animations, and responsive design. Build personal landing pages."
+  }
+]
+
+Return ONLY the JSON array. No extra text or explanation before or after it.
 `;
 
     // gimi api ko koll krega after getitng pronmt
@@ -54,7 +71,10 @@ Keep it motivating, clear, and step-by-step. Format neatly.
       }
     );
 
+    
+
     const roadmap = geminiRes.data.candidates?.[0]?.content?.parts?.[0]?.text;
+    console.log(roadmap)
 
     if (!roadmap) {
       return res.status(500).json({ error: "Invalid Gemini response", full: geminiRes.data });
