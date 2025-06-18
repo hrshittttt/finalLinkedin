@@ -22,8 +22,9 @@ import {
   SiTailwindcss,
   SiNextdotjs,
 } from "react-icons/si";
+import { FaSpinner } from "react-icons/fa";
 
-// ✅ Icon map for backend reference: send iconKey like "html", "react", etc.
+// ✅ Icon map with brand/native color via 'color' prop (react-icons default behavior if not overridden)
 const iconMap = {
   html: FaHtml5,
   css: FaCss3Alt,
@@ -72,7 +73,6 @@ export default function Roadmap() {
     fetchRoadmap();
   }, [uid]);
 
-  // ✅ Dynamic height and path generation for curved SVG based on number of roadmap items
   const curveHeight = roadmapItems.length * 180 + 100;
   const curvePath = Array.from({ length: roadmapItems.length }, (_, i) => {
     const y = (i + 1) * 200;
@@ -86,13 +86,14 @@ export default function Roadmap() {
       <AnimatePresence>
         {isLoading ? (
           <motion.div
-            className="relative flex items-center justify-center h-screen w-screen bg-linkedin-card text-white overflow-hidden"
+            className="relative flex flex-col gap-4 items-center justify-center h-screen w-screen bg-linkedin-card text-white overflow-hidden"
             initial={{ opacity: 1 }}
             animate={{ opacity: fadeOut ? 0 : 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
           >
             <div className="absolute w-80 h-80 bg-blue-500 opacity-30 blur-[100px] rounded-full z-0" />
+            <FaSpinner className="animate-spin text-4xl text-white z-10" />
             <motion.p
               className="relative z-10 text-2xl font-semibold text-center"
               initial={{ opacity: 0 }}
@@ -118,11 +119,13 @@ export default function Roadmap() {
               transition={{ duration: 0.6, delay: 0.2 }}
             />
 
-            <div className="relative md:w-1/2 flex items-start justify-center pt-10 overflow-y-scroll h-screen">
+            {/* Left Curve/Icons Panel */}
+            <div className="relative md:w-3/5 flex items-start justify-center pt-10">
+              {/* ✅ Removed overflow-y-scroll to prevent vertical scrollbar */}
               <svg
                 viewBox={`0 0 300 ${curveHeight}`}
                 className="absolute"
-                style={{ height: curveHeight }}
+                style={{ height: curveHeight, overflow: "visible" }}
               >
                 <path
                   d={fullPath}
@@ -143,8 +146,6 @@ export default function Roadmap() {
                   const isLeft = index % 2 !== 0;
                   const xOffset = 120;
                   const isActive = active === null || active === item.id;
-
-                  // ✅ Rendering icon from iconMap using iconKey sent by backend
                   const IconComponent =
                     iconMap[item.iconKey?.toLowerCase()] || FaJs;
 
@@ -168,7 +169,7 @@ export default function Roadmap() {
                       transition={{ duration: 0.2 }}
                     >
                       <div className="flex flex-col items-center gap-1">
-                        <IconComponent className="text-3xl" />
+                        <IconComponent size={28} color="inherit" />
                         <div className="text-white font-semibold text-sm">
                           {item.title}
                         </div>
@@ -180,8 +181,8 @@ export default function Roadmap() {
               </div>
             </div>
 
-            {/* ✅ Sticky container on the right side */}
-            <div className="md:w-1/2 p-6 sticky top-0 h-screen bg-linkedin-bg rounded-2xl shadow-inner overflow-y-auto">
+            {/* ✅ Sticky and vertically centered Right Side Box */}
+            <div className="md:w-2/5 h-[80vh] sticky top-[10vh] self-center bg-linkedin-bg rounded-2xl shadow-inner overflow-y-auto p-6">
               {active ? (
                 <motion.div
                   key={active}
@@ -198,7 +199,7 @@ export default function Roadmap() {
                             .find((item) => item.id === active)
                             ?.iconKey?.toLowerCase()
                         ] || FaJs;
-                      return <Icon className="text-3xl" />;
+                      return <Icon size={28} />;
                     })()}
                     {roadmapItems.find((item) => item.id === active)?.title}{" "}
                     Guide
@@ -207,7 +208,6 @@ export default function Roadmap() {
                     {roadmapItems.find((item) => item.id === active)?.details}
                   </p>
 
-                  {/* ✅ Focus points sent by backend as array */}
                   <div className="space-y-2">
                     <h3 className="text-xl font-semibold flex items-center gap-2">
                       <FaLightbulb className="text-yellow-300" />
@@ -222,7 +222,6 @@ export default function Roadmap() {
                     </ul>
                   </div>
 
-                  {/* ✅ Resource links or titles from backend */}
                   <div className="space-y-2">
                     <h3 className="text-xl font-semibold flex items-center gap-2">
                       <FaBook className="text-blue-300" />
@@ -237,7 +236,6 @@ export default function Roadmap() {
                     </ul>
                   </div>
 
-                  {/* ✅ Next steps: these should also be an array sent from backend */}
                   <div className="space-y-2">
                     <h3 className="text-xl font-semibold flex items-center gap-2">
                       <FaRocket className="text-pink-400" />
