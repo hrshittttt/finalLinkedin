@@ -1,26 +1,71 @@
+import { useEffect, useState } from "react";
+import { onAuthStateChanged, getAuth } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../src/assets/firebase";
+
 export default function Left() {
+  const [userData, setUserData] = useState(null);
+  const auth = getAuth();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        console.log("Logged in UID:", user.uid);
+
+        try {
+          const docRef = doc(db, "profiles", user.uid);
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists()) {
+            setUserData(docSnap.data());
+          } else {
+            console.log("No user profile found");
+          }
+        } catch (err) {
+          console.error("Error fetching Firestore:", err);
+        }
+      } else {
+        console.log("Not logged in");
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (userData) {
+      console.log("User data updated:", userData);
+    }
+  }, [userData]);
+
   return (
     <div className="w-80 h-56 bg-linkedin-bg rounded-lg relative left-44 top-5 border border-linkedin-border">
       <div className="w-79 h-14">
         <img
           className="rounded-t-lg"
           src="./Components/JobLens/Banner.png"
-        ></img>
+        />
       </div>
       <img
         src="./src/assets/Profile.png"
         className="rounded-[50%] h-16 w-16 border border-white relative left-4 bottom-6"
-      ></img>
-      <div className=" flex flex-col w-72 h-24 relative bottom-4 px-4">
-        <h3 className="text-linkedin-text font-bold text-xl">Harshit Suthar</h3>
-        <div className="flex flex-col gap-1">
-          <p className="text-xs text-white">CSE 28'@IET,MLSU</p>
-          <p className="text-xs text-gray-400">Udaipur, Rajasthan</p>
-          <span className="text-xs font-bold text-linkedin-text">
-            Mohanlal Sukhadia University (MLSU), Udaipur
-          </span>
+      />
+  
+      {userData ? (
+        <div className="flex flex-col w-72 h-24 relative bottom-4 px-4">
+          <h3 className="text-linkedin-text font-bold text-xl">{userData.name}</h3>
+          <div className="flex flex-col gap-1">
+            <p className="text-xs text-white">{userData.experience}</p>
+            <p className="text-xs text-gray-400">{userData.location}</p>
+            <span className="text-xs font-bold text-linkedin-text">
+              Mohanlal Sukhadia University (MLSU), Udaipur
+            </span>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="px-4 pt-4 text-white text-sm">Loading profile...</div>
+      )}
     </div>
   );
+  
 }
