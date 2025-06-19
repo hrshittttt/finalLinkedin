@@ -12,13 +12,14 @@ import {
   FaJs,
   FaSpinner,
 } from "react-icons/fa";
+
 import * as FAIcons from "react-icons/fa";
 import * as SIIcons from "react-icons/si";
 
+// ✅ Use exact iconKey sent by backend like "FaHtml5", "SiTailwindcss"
 function getIconComponent(iconKey) {
   if (!iconKey) return FaJs;
-  const key = iconKey.charAt(0).toUpperCase() + iconKey.slice(1);
-  return SIIcons[`Si${key}`] || FAIcons[`Fa${key}`] || FaJs;
+  return FAIcons[iconKey] || SIIcons[iconKey] || FaJs;
 }
 
 export default function Roadmap() {
@@ -103,6 +104,7 @@ export default function Roadmap() {
               transition={{ duration: 0.6, delay: 0.2 }}
             />
 
+            {/* Roadmap Curve + Items */}
             <div className="relative md:w-3/5 flex items-start justify-center pt-10">
               <svg
                 viewBox={`0 0 300 ${curveHeight}`}
@@ -154,7 +156,7 @@ export default function Roadmap() {
                       transition={{ duration: 0.2 }}
                     >
                       <div className="flex flex-col items-center gap-1">
-                        <Icon className="text-white text-3xl" />
+                        <Icon className="text-3xl text-white" />
                         <div className="text-white font-semibold text-sm">
                           {item.title}
                         </div>
@@ -166,7 +168,8 @@ export default function Roadmap() {
               </div>
             </div>
 
-            <div className="md:w-2/5 p-6 bg-linkedin-bg rounded-2xl shadow-inner overflow-y-auto self-center sticky h-auto">
+            {/* Right Info Box */}
+            <div className="md:w-2/5 p-6 bg-linkedin-bg rounded-2xl shadow-inner overflow-y-auto self-center sticky h-auto top-10">
               {lastActive ? (
                 <motion.div
                   key={lastActive}
@@ -189,6 +192,8 @@ export default function Roadmap() {
                         ?.details
                     }
                   </p>
+
+                  {/* Focus Points */}
                   <div className="space-y-2">
                     <h3 className="text-xl font-semibold flex items-center gap-2">
                       <FaLightbulb className="text-yellow-300" />
@@ -203,6 +208,8 @@ export default function Roadmap() {
                       ))}
                     </ul>
                   </div>
+
+                  {/* Resources */}
                   <div className="space-y-2">
                     <h3 className="text-xl font-semibold flex items-center gap-2">
                       <FaBook className="text-blue-300" />
@@ -217,6 +224,8 @@ export default function Roadmap() {
                       ))}
                     </ul>
                   </div>
+
+                  {/* Next Steps */}
                   <div className="space-y-2">
                     <h3 className="text-xl font-semibold flex items-center gap-2">
                       <FaRocket className="text-pink-400" />
