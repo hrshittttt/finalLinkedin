@@ -4,6 +4,7 @@ const { db } = require('../firebaseConfig');
 const admin = require('firebase-admin');
 const {checkExistingEmail, verifyFirebaseToken} = require("../middleware/user.middleware")
 
+
 router.post("/register", checkExistingEmail, async (req, res) => {
   const { email, password, name } = req.body;
 
@@ -64,8 +65,21 @@ router.post("/login", async (req, res) => {
     const userRecord = await admin.auth().getUserByEmail(email);
     const token = await admin.auth().createCustomToken(userRecord.uid);
 
+    console.log(userRecord.uid)
+    const doc = await db.collection("profiles").doc(userRecord.uid).get();
+    gation = "/profile"
+
+    if (!doc.exists) {
+     return res.json({
+      message: "Login ok",
+      uid: userDoc.id,
+      gation,
+      token,
+    });
+    }
+    
     res.json({
-      message: "Login successful",
+      message: "Login ok",
       uid: userDoc.id,
       email: userData.email,
       name: userData.name,

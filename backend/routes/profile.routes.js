@@ -6,7 +6,7 @@ const { verifyFirebaseToken } = require("../middleware/user.middleware");
 
 
 // POST: Update or create profile
-router.post("/update", verifyFirebaseToken,async (req, res) => {
+router.post("/update",async (req, res) => {
 
   
   const {
@@ -18,6 +18,7 @@ router.post("/update", verifyFirebaseToken,async (req, res) => {
     education, // array of objects rahega
     dreamCompanies,
     interests,
+    role,
     resumeUrl,
     githubURL,
   } = req.body;
@@ -48,10 +49,11 @@ router.post("/update", verifyFirebaseToken,async (req, res) => {
       interests: interests || [],
       resumeUrl: resumeUrl || "",
       githubURL: githubURL || "",
+      role:role,
       updatedAt: new Date(),
     };
 
-     console.log(profileData)
+    
 
     await db.collection("profiles").doc(uid).set(profileData, { merge: true });
 
