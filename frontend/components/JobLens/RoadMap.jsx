@@ -9,27 +9,16 @@ import {
   FaCompass,
   FaLaptopCode,
   FaHome,
-  FaSpinner,
   FaJs,
+  FaSpinner,
 } from "react-icons/fa";
 import * as FAIcons from "react-icons/fa";
 import * as SIIcons from "react-icons/si";
-import * as MDIcons from "react-icons/md";
-import * as TBIcons from "react-icons/tb";
-import * as HIIcons from "react-icons/hi";
-import * as BSIcons from "react-icons/bs";
-
-const allIconPacks = {
-  ...FAIcons,
-  ...SIIcons,
-  ...MDIcons,
-  ...TBIcons,
-  ...HIIcons,
-  ...BSIcons,
-};
 
 function getIconComponent(iconKey) {
-  return allIconPacks[iconKey] || FaJs;
+  if (!iconKey) return FaJs;
+  const key = iconKey.charAt(0).toUpperCase() + iconKey.slice(1);
+  return SIIcons[`Si${key}`] || FAIcons[`Fa${key}`] || FaJs;
 }
 
 export default function Roadmap() {
@@ -165,7 +154,7 @@ export default function Roadmap() {
                       transition={{ duration: 0.2 }}
                     >
                       <div className="flex flex-col items-center gap-1">
-                        <Icon className="text-3xl" />
+                        <Icon className="text-white text-3xl" />
                         <div className="text-white font-semibold text-sm">
                           {item.title}
                         </div>
@@ -200,8 +189,6 @@ export default function Roadmap() {
                         ?.details
                     }
                   </p>
-
-                  {/* Focus */}
                   <div className="space-y-2">
                     <h3 className="text-xl font-semibold flex items-center gap-2">
                       <FaLightbulb className="text-yellow-300" />
@@ -216,8 +203,6 @@ export default function Roadmap() {
                       ))}
                     </ul>
                   </div>
-
-                  {/* Resources */}
                   <div className="space-y-2">
                     <h3 className="text-xl font-semibold flex items-center gap-2">
                       <FaBook className="text-blue-300" />
@@ -232,8 +217,6 @@ export default function Roadmap() {
                       ))}
                     </ul>
                   </div>
-
-                  {/* Next Steps */}
                   <div className="space-y-2">
                     <h3 className="text-xl font-semibold flex items-center gap-2">
                       <FaRocket className="text-pink-400" />
