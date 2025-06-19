@@ -23,11 +23,10 @@ export default function LinkedInForm() {
   const roleWrapperRef = useRef(null);
   const navigate = useNavigate();
 
-
-  const karDiyaSubmit = ()=>{
-    navigate("/") 
-        window.location.reload();
-  }
+  const karDiyaSubmit = () => {
+    navigate("/");
+    window.location.reload();
+  };
 
   const skills = [
     "JavaScript",
@@ -333,7 +332,7 @@ export default function LinkedInForm() {
             )}
             {step === 3 && (
               <Step title="Select your skills">
-                <div ref={wrapperRef} className="relative">
+                <div ref={skillWrapperRef} className="relative">
                   <input
                     type="search"
                     className={inputClass}
@@ -397,7 +396,7 @@ export default function LinkedInForm() {
             )}
             {step === 6 && (
               <Step title="Which roles are you aiming for?">
-                <div ref={wrapperRef} className="relative">
+                <div ref={roleWrapperRef} className="relative">
                   <input
                     type="search"
                     className={inputClass}
