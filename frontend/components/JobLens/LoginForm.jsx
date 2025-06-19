@@ -18,7 +18,8 @@ export default function LinkedInForm() {
   const [searchRole, setSearchRole] = useState("");
   const [showRoleSuggestions, setShowRoleSuggestions] = useState(false);
   const [errors, setErrors] = useState({});
-  const wrapperRef = useRef(null);
+  const skillWrapperRef = useRef(null);
+  const roleWrapperRef = useRef(null);
 
   const skills = [
     "JavaScript",
@@ -184,8 +185,16 @@ export default function LinkedInForm() {
 
   useEffect(() => {
     function handleClickOutside(e) {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+      if (
+        skillWrapperRef.current &&
+        !skillWrapperRef.current.contains(e.target)
+      ) {
         setShowSuggestions(false);
+      }
+      if (
+        roleWrapperRef.current &&
+        !roleWrapperRef.current.contains(e.target)
+      ) {
         setShowRoleSuggestions(false);
       }
     }
