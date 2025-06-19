@@ -1,13 +1,17 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Home from "../components/Main/Hero.jsx";
 import Login from "../components/Authentication/Login.jsx";
 import Signup from "../components/Authentication/Signup.jsx";
 import Profile from "../components/JobLens/LoginForm.jsx";
 import Roadmap from "../components/JobLens/RoadMap.jsx";
 import JobHome from "../components/JobLens/JobHome.jsx";
-import CompanyInterview from "../components/JobLens/CompanyBasedInterview.jsx";
 import ProfileInterview from "../components/JobLens/ProfileBasedInterview.jsx";
-
+import CompanyInterview from "../components/JobLens/CompanyBasedInterview.jsx";
 
 export default function App() {
   const isLoggedIn = !!localStorage.getItem("token");
