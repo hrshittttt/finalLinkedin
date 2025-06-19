@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function LinkedInForm() {
   const [step, setStep] = useState(1);
@@ -18,7 +19,15 @@ export default function LinkedInForm() {
   const [searchRole, setSearchRole] = useState("");
   const [showRoleSuggestions, setShowRoleSuggestions] = useState(false);
   const [errors, setErrors] = useState({});
-  const wrapperRef = useRef(null);
+  const skillWrapperRef = useRef(null);
+  const roleWrapperRef = useRef(null);
+  const navigate = useNavigate();
+
+
+  const karDiyaSubmit = ()=>{
+    navigate("/") 
+        window.location.reload();
+  }
 
   const skills = [
     "JavaScript",
@@ -184,8 +193,16 @@ export default function LinkedInForm() {
 
   useEffect(() => {
     function handleClickOutside(e) {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+      if (
+        skillWrapperRef.current &&
+        !skillWrapperRef.current.contains(e.target)
+      ) {
         setShowSuggestions(false);
+      }
+      if (
+        roleWrapperRef.current &&
+        !roleWrapperRef.current.contains(e.target)
+      ) {
         setShowRoleSuggestions(false);
       }
     }
@@ -482,6 +499,7 @@ export default function LinkedInForm() {
             <button
               type="submit"
               className="bg-green-600 text-white px-4 py-2 rounded"
+              onClick={karDiyaSubmit}
             >
               Submit
             </button>
