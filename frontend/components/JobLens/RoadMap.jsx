@@ -48,6 +48,7 @@ export default function Roadmap() {
         }
 
         const roadmapArray = JSON.parse(raw);
+        console.log(roadmapArray)
         setRoadmapItems(roadmapArray);
       } catch (err) {
         console.error("Error fetching roadmap:", err.message);
