@@ -29,33 +29,44 @@ You're an expert career coach AI.
 A student named ${name} has the following profile:
 - Skills: ${skills.join(", ") || "N/A"}
 - Experience: ${experience || "No experience"}
-- Interests: ${interests.join(", ") || ""}
+- Interests: ${interests.join(", ") || "N/A"}
 - Dream Company: ${dreamCompany}
 
-🎯 Generate a complete web development roadmap tailored to help the student crack ${dreamCompany}. Format it strictly as a JSON array of objects with the following fields only:
+🎯 Your task is to generate a complete web development roadmap to help the student crack ${dreamCompany}. Return the roadmap as a **JSON array of objects**, strictly in the format mentioned below.
 
-- "title": the name of the skill or topic (e.g., "HTML")
-- "time": how long to spend on it (e.g., "1 week", "2-3 weeks")
-- "details": a short motivating and clear explanation of what to learn and do
+Each object must have:
 
-⚠️ Example Output (format exactly like this, in raw JSON format): even need id too 
+- "id": a number starting from 1
+- "title": only the name of the technology/tool (e.g., "HTML", "CSS", "JavaScript", "React", etc.)
+- "time": estimated time to learn it (e.g., "1 week", "2-3 weeks")
+- "details": a clear, motivating paragraph (100–150 words) explaining what to learn and how it helps in real-world jobs
+- "iconKey": same as title, but all lowercase (e.g., "html", "css", "react")
+- "focus": an array of 3 key sub-topics or focus areas related to the title (e.g., for HTML: ["Semantic elements", "Forms", "Accessibility"])
+- "resources": an array of 3 best free or paid learning platforms for that topic (e.g., ["MDN Docs", "FreeCodeCamp", "YouTube"])
+- "nextSteps": an array of 3 practical things the student should build or do after learning that skill (e.g., ["Build a personal site", "Clone a landing page", "Submit projects on GitHub"])
+
+⚠️ Output Format Example:
 
 [
   {
-    "id": "1",
+    "id": 1,
     "title": "HTML",
     "time": "1 week",
-    "details": "Learn HTML tags, structure, semantic elements, and forms. Focus on accessibility and SEO basics."
+    "details": "Write a motivating 100–150 word paragraph here about HTML...",
+    "iconKey": "html",
+    "focus": ["Semantic elements", "Forms", "Accessibility"],
+    "resources": ["MDN Docs", "FreeCodeCamp", "YouTube"],
+    "nextSteps": ["Build a personal site", "Clone a simple landing page", "Make a resume with HTML only"]
   },
   {
-    "id": "2",
+    "id": 2,
     "title": "CSS",
-    "time": "1-2 weeks",
-    "details": "Master Flexbox, Grid, animations, and responsive design. Build personal landing pages."
+    ...
   }
 ]
 
-Return ONLY the JSON array. No extra text or explanation before or after it.
+✅ Very important: Return only the **raw JSON array**.  
+❌ No headings, no explanations, no markdown formatting, no backticks, no text before or after.
 `;
 
     // gimi api ko koll krega after getitng pronmt
@@ -70,11 +81,9 @@ Return ONLY the JSON array. No extra text or explanation before or after it.
         },
       }
     );
-
     
-
     const roadmap = geminiRes.data.candidates?.[0]?.content?.parts?.[0]?.text;
-    console.log(roadmap)
+ 
 
     if (!roadmap) {
       return res.status(500).json({ error: "Invalid Gemini response", full: geminiRes.data });
