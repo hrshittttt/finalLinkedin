@@ -9,11 +9,14 @@ export default function LinkedInForm() {
   const [experiences, setExperiences] = useState("");
   const [education, setEducation] = useState("");
   const [targetCompany, setTargetCompany] = useState("");
+  const [selectedRoles, setSelectedRoles] = useState([]);
   const [resume, setResume] = useState(null);
   const [gitUrl, setGitURL] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSkills, setSelectedSkills] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [searchRole, setSearchRole] = useState("");
+  const [showRoleSuggestions, setShowRoleSuggestions] = useState(false);
   const [errors, setErrors] = useState({});
   const wrapperRef = useRef(null);
 
@@ -130,10 +133,33 @@ export default function LinkedInForm() {
     "Vercel",
   ];
 
+  const roles = [
+    "Frontend Developer",
+    "Backend Developer",
+    "Full Stack Developer",
+    "DevOps Engineer",
+    "Data Scientist",
+    "Machine Learning Engineer",
+    "AI Researcher",
+    "Product Manager",
+    "Software Engineer",
+    "Mobile Developer",
+    "Security Engineer",
+    "UI/UX Designer",
+    "Cloud Engineer",
+    "QA Engineer",
+  ];
+
   const filteredSkills = skills.filter(
     (skill) =>
       skill.toLowerCase().includes(searchTerm.toLowerCase()) &&
       !selectedSkills.includes(skill)
+  );
+
+  const filteredRoles = roles.filter(
+    (role) =>
+      role.toLowerCase().includes(searchRole.toLowerCase()) &&
+      !selectedRoles.includes(role)
   );
 
   const handleSelect = (skill) => {
@@ -146,10 +172,21 @@ export default function LinkedInForm() {
     setSelectedSkills(selectedSkills.filter((s) => s !== skill));
   };
 
+  const handleSelectRole = (role) => {
+    setSelectedRoles([...selectedRoles, role]);
+    setSearchRole("");
+    setShowRoleSuggestions(false);
+  };
+
+  const handleRemoveRole = (role) => {
+    setSelectedRoles(selectedRoles.filter((r) => r !== role));
+  };
+
   useEffect(() => {
     function handleClickOutside(e) {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
         setShowSuggestions(false);
+        setShowRoleSuggestions(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -167,10 +204,12 @@ export default function LinkedInForm() {
       newErrors.location = "Location is required";
     if (step === 5 && !education.trim())
       newErrors.education = "Education is required";
-    if (step === 6 && !targetCompany.trim())
+    if (step === 6 && selectedRoles.length === 0)
+      newErrors.selectedRoles = "Select at least one role";
+    if (step === 7 && !targetCompany.trim())
       newErrors.targetCompany = "Target company is required";
-    if (step === 7 && !resume) newErrors.resume = "Resume is required";
-    if (step === 8) {
+    if (step === 8 && !resume) newErrors.resume = "Resume is required";
+    if (step === 9) {
       const urlRegex =
         /^(https?:\/\/)?(www\.)?github\.com\/[A-Za-z0-9_.-]+\/?$/;
       if (!gitUrl.trim()) newErrors.gitUrl = "GitHub URL is required";
@@ -191,9 +230,7 @@ export default function LinkedInForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateStep()) return;
-
     const token = localStorage.getItem("token");
     const uid = localStorage.getItem("uid");
 
@@ -204,6 +241,7 @@ export default function LinkedInForm() {
       experience: experiences,
       location,
       education,
+      role: selectedRoles,
       dreamCompanies: [targetCompany],
       resumeUrl: "ihtisrhfkih",
       githubURL: gitUrl,
@@ -220,17 +258,25 @@ export default function LinkedInForm() {
           },
         }
       );
-
-      console.log("Backend Response:", res.data); // "Profile updated successfully"
-
-      alert(" Profile updated successfully!");
+      alert("Profile updated successfully!");
     } catch (err) {
-      console.error("Profile update error:", err.response?.data || err.message);
       alert(err.response?.data?.error || "Something went wrong!");
     }
   };
+
   const inputClass =
     "w-full h-10 py-3 pl-3 bg-linkedin-bg text-linkedin-text text-lg border border-linkedin-border rounded-md placeholder-transparent focus:outline-none focus:ring-2 focus:ring-linkedin-blue";
+
+  const Step = ({ title, children }) => (
+    <div className="space-y-3">
+      <h2 className="text-2xl font-semibold mb-4">{title}</h2>
+      {children}
+    </div>
+  );
+
+  const ErrorText = ({ children }) => (
+    <p className="text-red-400 text-sm mt-1">{children}</p>
+  );
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-linkedin-card px-4">
@@ -256,7 +302,6 @@ export default function LinkedInForm() {
                 {errors.name && <ErrorText>{errors.name}</ErrorText>}
               </Step>
             )}
-
             {step === 2 && (
               <Step title="What's your experience?">
                 <input
@@ -269,7 +314,6 @@ export default function LinkedInForm() {
                 )}
               </Step>
             )}
-
             {step === 3 && (
               <Step title="Select your skills">
                 <div ref={wrapperRef} className="relative">
@@ -314,7 +358,6 @@ export default function LinkedInForm() {
                 </div>
               </Step>
             )}
-
             {step === 4 && (
               <Step title="Where are you located?">
                 <input
@@ -325,7 +368,6 @@ export default function LinkedInForm() {
                 {errors.location && <ErrorText>{errors.location}</ErrorText>}
               </Step>
             )}
-
             {step === 5 && (
               <Step title="Your Education">
                 <input
@@ -336,8 +378,53 @@ export default function LinkedInForm() {
                 {errors.education && <ErrorText>{errors.education}</ErrorText>}
               </Step>
             )}
-
             {step === 6 && (
+              <Step title="Which roles are you aiming for?">
+                <div ref={wrapperRef} className="relative">
+                  <input
+                    type="search"
+                    className={inputClass}
+                    value={searchRole}
+                    onChange={(e) => setSearchRole(e.target.value)}
+                    onFocus={() => setShowRoleSuggestions(true)}
+                  />
+                  {showRoleSuggestions && filteredRoles.length > 0 && (
+                    <ul className="absolute z-10 w-full bg-linkedin-bg border border-linkedin-border rounded mt-1 shadow max-h-40 overflow-y-auto">
+                      {filteredRoles.map((role, idx) => (
+                        <li
+                          key={idx}
+                          className="px-4 py-2 text-linkedin-text hover:bg-linkedin-hover-blue cursor-pointer"
+                          onClick={() => handleSelectRole(role)}
+                        >
+                          {role}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                {errors.selectedRoles && (
+                  <ErrorText>{errors.selectedRoles}</ErrorText>
+                )}
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {selectedRoles.map((role, index) => (
+                    <span
+                      key={index}
+                      className="flex items-center gap-2 bg-gray-700 px-3 py-1 rounded-full text-sm"
+                    >
+                      {role}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveRole(role)}
+                        className="text-red-400"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </Step>
+            )}
+            {step === 7 && (
               <Step title="Target Company">
                 <input
                   className={inputClass}
@@ -349,8 +436,7 @@ export default function LinkedInForm() {
                 )}
               </Step>
             )}
-
-            {step === 7 && (
+            {step === 8 && (
               <Step title="Upload your resume">
                 <input
                   type="text"
@@ -360,8 +446,7 @@ export default function LinkedInForm() {
                 {errors.resume && <ErrorText>{errors.resume}</ErrorText>}
               </Step>
             )}
-
-            {step === 8 && (
+            {step === 9 && (
               <Step title="GitHub Profile URL">
                 <input
                   type="url"
@@ -372,41 +457,8 @@ export default function LinkedInForm() {
                 {errors.gitUrl && <ErrorText>{errors.gitUrl}</ErrorText>}
               </Step>
             )}
-
-            {step === 9 && (
-              <Step title="Summary before submit">
-                <ul className="text-sm space-y-2">
-                  <li>
-                    <strong>Name:</strong> {name}
-                  </li>
-                  <li>
-                    <strong>Experience:</strong> {experiences}
-                  </li>
-                  <li>
-                    <strong>Skills:</strong> {selectedSkills.join(", ")}
-                  </li>
-                  <li>
-                    <strong>Location:</strong> {location}
-                  </li>
-                  <li>
-                    <strong>Education:</strong> {education}
-                  </li>
-                  <li>
-                    <strong>Target Company:</strong> {targetCompany}
-                  </li>
-                  <li>
-                    <strong>GitHub:</strong> {gitUrl}
-                  </li>
-                  <li>
-                    <strong>Resume:</strong> {resume?.name}
-                  </li>
-                </ul>
-              </Step>
-            )}
           </motion.div>
         </AnimatePresence>
-
-        {/* Navigation */}
         <div className="flex justify-between items-center mt-6">
           {step > 1 && (
             <button
@@ -435,7 +487,6 @@ export default function LinkedInForm() {
             </button>
           )}
         </div>
-
         <div className="text-sm text-right mt-2 text-linkedin-secondary-text">
           Step {step} of 9
         </div>
@@ -443,14 +494,3 @@ export default function LinkedInForm() {
     </div>
   );
 }
-
-const Step = ({ title, children }) => (
-  <div className="space-y-3">
-    <h2 className="text-2xl font-semibold mb-4">{title}</h2>
-    {children}
-  </div>
-);
-
-const ErrorText = ({ children }) => (
-  <p className="text-red-400 text-sm mt-1">{children}</p>
-);
