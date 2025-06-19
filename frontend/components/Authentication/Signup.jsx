@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Signup() {
   const [mail, setMail] = useState("");
@@ -7,6 +8,8 @@ export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,10 +32,13 @@ export default function Signup() {
           password: password,
         }),
       });
-
+      
       const data = await res.json();
       if (res.ok) {
+        
         alert("✅ Signup Successful!");
+        navigate("/login")
+
       } else {
         setError(data.error || "Something went wrong");
       }

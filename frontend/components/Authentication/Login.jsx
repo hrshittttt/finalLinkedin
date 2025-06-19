@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../src/assets/firebase";
 import { Link , useNavigate } from "react-router-dom";
 
 
@@ -15,8 +13,7 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, mail, pass);
-      const idToken = await userCredential.user.getIdToken();
+      
 
       const res = await fetch("http://localhost:4000/users/login", {
         method: "POST",
@@ -24,15 +21,25 @@ export default function Login() {
         body: JSON.stringify({ email: mail, password: pass }),
       });
 
+      
       const data = await res.json();
+      console.log("first",data)
       if (!res.ok) throw new Error(data.error || "Login failed");
 
-      localStorage.setItem("token", idToken);
-      localStorage.setItem("uid", userCredential.user.uid);
+      if(data.gation){
+        localStorage.setItem("token", data.token)
+        localStorage.setItem("uid", data.uid) 
+        navigate(data.gation) 
+        window.location.reload();
+      }else {
+        localStorage.setItem("token", data.token)
+        localStorage.setItem("uid", data.uid) 
+        navigate("/");
+        window.location.reload();
+      }
 
 
-      navigate("/");
-      window.location.reload();
+     
     } catch (error) {
       console.error("Login Failed:", error.message);
       alert(error.message);
