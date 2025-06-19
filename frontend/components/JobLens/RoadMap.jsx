@@ -9,16 +9,27 @@ import {
   FaCompass,
   FaLaptopCode,
   FaHome,
-  FaJs,
   FaSpinner,
+  FaJs,
 } from "react-icons/fa";
 import * as FAIcons from "react-icons/fa";
 import * as SIIcons from "react-icons/si";
+import * as MDIcons from "react-icons/md";
+import * as TBIcons from "react-icons/tb";
+import * as HIIcons from "react-icons/hi";
+import * as BSIcons from "react-icons/bs";
+
+const allIconPacks = {
+  ...FAIcons,
+  ...SIIcons,
+  ...MDIcons,
+  ...TBIcons,
+  ...HIIcons,
+  ...BSIcons,
+};
 
 function getIconComponent(iconKey) {
-  if (!iconKey) return FaJs;
-  const key = iconKey.charAt(0).toUpperCase() + iconKey.slice(1);
-  return SIIcons[`Si${key}`] || FAIcons[`Fa${key}`] || FaJs;
+  return allIconPacks[iconKey] || FaJs;
 }
 
 export default function Roadmap() {
@@ -167,7 +178,7 @@ export default function Roadmap() {
               </div>
             </div>
 
-            <div className="md:w-2/5 p-6 bg-linkedin-bg rounded-2xl shadow-inner overflow-y-auto self-center sticky top-[10vh] h-auto">
+            <div className="md:w-2/5 p-6 bg-linkedin-bg rounded-2xl shadow-inner overflow-y-auto self-center sticky h-auto">
               {lastActive ? (
                 <motion.div
                   key={lastActive}
@@ -190,6 +201,8 @@ export default function Roadmap() {
                         ?.details
                     }
                   </p>
+
+                  {/* Focus */}
                   <div className="space-y-2">
                     <h3 className="text-xl font-semibold flex items-center gap-2">
                       <FaLightbulb className="text-yellow-300" />
@@ -204,6 +217,8 @@ export default function Roadmap() {
                       ))}
                     </ul>
                   </div>
+
+                  {/* Resources */}
                   <div className="space-y-2">
                     <h3 className="text-xl font-semibold flex items-center gap-2">
                       <FaBook className="text-blue-300" />
@@ -218,6 +233,8 @@ export default function Roadmap() {
                       ))}
                     </ul>
                   </div>
+
+                  {/* Next Steps */}
                   <div className="space-y-2">
                     <h3 className="text-xl font-semibold flex items-center gap-2">
                       <FaRocket className="text-pink-400" />
