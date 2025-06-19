@@ -29,49 +29,38 @@ router.post("/generate", async (req, res) => {
 
     // api k liya promt banega
     const prompt = `
-    You're an expert career coach AI.
+    You're an expert, professional career coach AI.
 
-    A student named ${name} has the following profile:
-    - Skills: ${skills.join(", ") || "N/A"}
-    - Experience: ${experience || "No experience"}
-    - Interests: ${interests.join(", ") || "N/A"}
-    - Dream Company: ${dreamCompany}
-    
-    🎯 Your task is to generate a complete web development roadmap to help the student crack ${dreamCompany}. Return the roadmap as a **JSON array of objects**, strictly in the format mentioned below.
-    
-    Each object must have:
-    
-    - "id": a number starting from 1
-    - "title": only the name of the technology/tool (e.g., "HTML", "CSS", "JavaScript", "React", etc.)
-    - "time": estimated time to learn it (e.g., "1 week", "2-3 weeks")
-    - "details": a clear, motivating paragraph (100–150 words) explaining what to learn and how it helps in real-world jobs
-    - "iconKey": 🔁 match the title to the closest matching icon name from the **react-icons** library (e.g., for "HTML", use "FaHtml5", for "CSS" use "FaCss3Alt", etc.)
-    - "focus": an array of 3 key sub-topics or focus areas related to the title (e.g., for HTML: ["Semantic elements", "Forms", "Accessibility"])
-    - "resources": an array of 3 best free or paid learning platforms for that topic (e.g., ["MDN Docs", "FreeCodeCamp", "YouTube"])
-    - "nextSteps": an array of 3 practical things the student should build or do after learning that skill (e.g., ["Build a personal site", "Clone a landing page", "Submit projects on GitHub"])
-    
-    ⚠️ Output Format Example:
-    
-    [
-      {
-        "id": 1,
-        "title": "HTML",
-        "time": "1 week",
-        "details": "Write a motivating 100–150 word paragraph here about HTML...",
-        "iconKey": "FaHtml5",
-        "focus": ["Semantic elements", "Forms", "Accessibility"],
-        "resources": ["MDN Docs", "FreeCodeCamp", "YouTube"],
-        "nextSteps": ["Build a personal site", "Clone a simple landing page", "Make a resume with HTML only"]
-      },
-      {
-        "id": 2,
-        "title": "CSS",
-        ...
-      }
-    ]
-    
-    ✅ Very important: Return only the **raw JSON array**.  
-    ❌ No headings, no explanations, no markdown formatting, no backticks, no text before or after.
+A student named ${name} has the following profile:
+- Skills: ${skills.join(", ") || "N/A"}
+- Experience: ${experience || "No experience"}
+- Interests: ${interests.join(", ") || "N/A"}
+- Dream Company: ${dreamCompany}
+- Target Role: "Software Engineer"}
+
+🎯 Your task is to generate a **complete career roadmap** to help the student **crack a job at ${dreamCompany}**, specifically tailored for the role of software eng.
+
+🔧 The roadmap must:
+- Be fully personalized for ${dreamCompany}, based on the actual hiring process, skills, and expectations.
+- Include all necessary **programming languages, technologies, tools, and soft skills**.
+- Include the **ideal learning order** with clear progression.
+- Focus on **high-impact learning** and **project-building**.
+- Be realistic and motivating, while covering real-world skills relevant to that company.
+
+🧠 Return the roadmap as a **raw JSON array of objects**, strictly in the format below:
+
+Each object must include:
+- "id": number starting from 1
+- "title": name of technology/tool (e.g., "JavaScript", "Data Structures", "System Design","html", "CSS", "React", "Node.js"  etc)  strictly make it shorter in 2-3 words and no use of parantheses
+- "time": estimated time to learn it (e.g., "2-3 weeks", "1 month")
+- "details": 100–150 words motivating paragraph on why this is important, how it helps get hired at ${dreamCompany}, and how to learn it
+- "iconKey": 🔁 best matching icon name from react-icons (e.g., "FaJava", "SiLeetcode", "FaDatabase", "FaReact", "FaNodeJs")
+- "focus": array of 3 sub-topics or concepts to focus on for this skill
+- "resources": best 3 free or paid platforms to learn (e.g., "FreeCodeCamp", "YouTube", "Coursera", "LeetCode")
+- "nextSteps": 3 practical actions/projects to do after learning it (e.g., "Solve 50 LeetCode problems", "Build a full-stack app", "Mock interview with a friend")
+
+✅ Only return the **raw JSON array**.
+❌ Do NOT add any explanation, headings, code block, or markdown formatting before or after.
     
 `;
 
@@ -89,7 +78,7 @@ router.post("/generate", async (req, res) => {
     );
 
     const roadmap = geminiRes.data.candidates?.[0]?.content?.parts?.[0]?.text;
-    console.log(roadmap)
+    console.log(roadmap);
 
     if (!roadmap) {
       return res

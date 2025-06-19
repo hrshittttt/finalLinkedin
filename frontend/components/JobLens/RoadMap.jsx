@@ -49,7 +49,7 @@ export default function Roadmap() {
         }
 
         const roadmapArray = JSON.parse(raw);
-        console.log(roadmapArray)
+        console.log(roadmapArray);
         setRoadmapItems(roadmapArray);
       } catch (err) {
         console.error("Error fetching roadmap:", err.message);
@@ -118,9 +118,6 @@ export default function Roadmap() {
                   strokeWidth="4"
                   fill="none"
                 />
-                <text x="140" y={curveHeight - 10} fill="#60A5FA" fontSize="24">
-                  ▶
-                </text>
               </svg>
 
               <div
@@ -149,7 +146,7 @@ export default function Roadmap() {
                       }`}
                       style={{
                         top: `${index * 180 + 60}px`,
-                        left: "150px",
+                        left: "200px",
                         opacity: isActive ? 1 : 0.2,
                       }}
                       initial={{ x: isLeft ? -xOffset : xOffset }}
@@ -245,8 +242,8 @@ export default function Roadmap() {
               ) : (
                 <div className="text-gray-400 text-left space-y-4">
                   <h2 className="text-2xl font-bold flex items-center gap-2">
-                    <FaMapSigns className="text-teal-400" /> Welcome to Your Web
-                    Dev Journey!
+                    <FaMapSigns className="text-teal-400" /> Welcome to Your
+                    Coding Journey!
                   </h2>
                   <p className="flex items-center gap-2">
                     <FaCompass className="text-yellow-300" /> Hover over any
@@ -254,8 +251,8 @@ export default function Roadmap() {
                   </p>
                   <ul className="list-disc list-inside text-sm space-y-1">
                     <li className="flex items-center gap-2">
-                      <FaLaptopCode className="text-green-400" /> Explore from
-                      HTML to Next.js
+                      <FaLaptopCode className="text-green-400" />
+                      Explore from anything to everything
                     </li>
                     <li className="flex items-center gap-2">
                       <FaBook className="text-blue-300" /> Get focused study
