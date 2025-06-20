@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
+
 import { useNavigate } from "react-router-dom";
 
 export default function LinkedInForm() {
@@ -21,13 +22,6 @@ export default function LinkedInForm() {
   const [errors, setErrors] = useState({});
   const skillWrapperRef = useRef(null);
   const roleWrapperRef = useRef(null);
-  const navigate = useNavigate();
-
-
-  const karDiyaSubmit = ()=>{
-    navigate("/") 
-        window.location.reload();
-  }
 
   const skills = [
     "JavaScript",
@@ -303,10 +297,10 @@ export default function LinkedInForm() {
       >
         <AnimatePresence mode="wait">
           <motion.div
-            key={step}
-            initial={{ x: 100, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -100, opacity: 0 }}
+            layout
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
             {step === 1 && (
@@ -333,7 +327,7 @@ export default function LinkedInForm() {
             )}
             {step === 3 && (
               <Step title="Select your skills">
-                <div ref={wrapperRef} className="relative">
+                <div ref={skillWrapperRef} className="relative">
                   <input
                     type="search"
                     className={inputClass}
@@ -397,7 +391,7 @@ export default function LinkedInForm() {
             )}
             {step === 6 && (
               <Step title="Which roles are you aiming for?">
-                <div ref={wrapperRef} className="relative">
+                <div ref={roleWrapperRef} className="relative">
                   <input
                     type="search"
                     className={inputClass}
