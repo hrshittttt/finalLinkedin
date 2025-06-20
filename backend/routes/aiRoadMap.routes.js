@@ -25,6 +25,7 @@ router.post("/generate", async (req, res) => {
       experience = "",
       dreamCompany = "Top Tech Companies",
       interests = [],
+      roles = [],
     } = profile;
 
     // api k liya promt banega
@@ -38,7 +39,7 @@ A student named ${name} has the following profile:
 - Dream Company: ${dreamCompany}
 - Target Role: "Software Engineer"}
 
-🎯 Your task is to generate a **complete career roadmap** to help the student **crack a job at ${dreamCompany}**, specifically tailored for the role of software eng.
+🎯 Your task is to generate a **complete career roadmap** to help the student **crack a job at ${dreamCompany}**, specifically tailored for the role of ${roles}.
 
 🔧 The roadmap must:
 - Be fully personalized for ${dreamCompany}, based on the actual hiring process, skills, and expectations.
