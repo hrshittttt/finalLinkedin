@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
+
 import { useNavigate } from "react-router-dom";
 
 export default function LinkedInForm() {
@@ -21,12 +22,6 @@ export default function LinkedInForm() {
   const [errors, setErrors] = useState({});
   const skillWrapperRef = useRef(null);
   const roleWrapperRef = useRef(null);
-  const navigate = useNavigate();
-
-  const karDiyaSubmit = () => {
-    navigate("/");
-    window.location.reload();
-  };
 
   const skills = [
     "JavaScript",
@@ -522,7 +517,7 @@ export default function LinkedInForm() {
             <button
               type="submit"
               className="bg-green-600 text-white px-4 py-2 rounded"
-              onClick={karDiyaSubmit}
+                
             >
               Submit
             </button>
