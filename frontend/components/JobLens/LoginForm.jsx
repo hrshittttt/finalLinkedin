@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -265,16 +265,12 @@ export default function LinkedInForm() {
     };
 
     try {
-      const res = await axios.post(
-        "http://localhost:4000/profile/update",
-        profileData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await axios.post("http://localhost:4000/profile/update", profileData, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
       alert("Profile updated successfully!");
     } catch (err) {
       alert(err.response?.data?.error || "Something went wrong!");
@@ -284,16 +280,208 @@ export default function LinkedInForm() {
   const inputClass =
     "w-full h-10 py-3 pl-3 bg-linkedin-bg text-linkedin-text text-lg border border-linkedin-border rounded-md placeholder-transparent focus:outline-none focus:ring-2 focus:ring-linkedin-blue";
 
-  const Step = ({ title, children }) => (
-    <div className="space-y-3">
-      <h2 className="text-2xl font-semibold mb-4">{title}</h2>
-      {children}
-    </div>
+  const Step = useCallback(
+    ({ title, children }) => (
+      <div className="space-y-3">
+        <h2 className="text-2xl font-semibold mb-4">{title}</h2>
+        {children}
+      </div>
+    ),
+    []
   );
 
-  const ErrorText = ({ children }) => (
-    <p className="text-red-400 text-sm mt-1">{children}</p>
+  const ErrorText = useCallback(
+    ({ children }) => <p className="text-red-400 text-sm mt-1">{children}</p>,
+    []
   );
+
+  const renderStep = () => {
+    switch (step) {
+      case 1:
+        return (
+          <Step title="What's your full name?">
+            <input
+              key="name-input"
+              className={inputClass}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            {errors.name && <ErrorText>{errors.name}</ErrorText>}
+          </Step>
+        );
+      case 2:
+        return (
+          <Step title="What's your experience?">
+            <input
+              key="experience-input"
+              className={inputClass}
+              value={experiences}
+              onChange={(e) => setExperiences(e.target.value)}
+            />
+            {errors.experiences && <ErrorText>{errors.experiences}</ErrorText>}
+          </Step>
+        );
+      case 3:
+        return (
+          <Step title="Select your skills">
+            <div ref={skillWrapperRef} className="relative">
+              <input
+                key="skills-input"
+                type="search"
+                className={inputClass}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onFocus={() => setShowSuggestions(true)}
+              />
+              {showSuggestions && filteredSkills.length > 0 && (
+                <ul className="absolute z-10 w-full bg-linkedin-bg border border-linkedin-border rounded mt-1 shadow max-h-40 overflow-y-auto">
+                  {filteredSkills.map((skill, idx) => (
+                    <li
+                      key={idx}
+                      className="px-4 py-2 text-linkedin-text hover:bg-linkedin-hover-blue cursor-pointer"
+                      onClick={() => handleSelect(skill)}
+                    >
+                      {skill}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            {errors.skills && <ErrorText>{errors.skills}</ErrorText>}
+            <div className="flex flex-wrap gap-2 mt-3">
+              {selectedSkills.map((skill, index) => (
+                <span
+                  key={index}
+                  className="flex items-center gap-2 bg-gray-700 px-3 py-1 rounded-full text-sm"
+                >
+                  {skill}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveSkill(skill)}
+                    className="text-red-400"
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          </Step>
+        );
+      case 4:
+        return (
+          <Step title="Where are you located?">
+            <input
+              key="location-input"
+              className={inputClass}
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+            />
+            {errors.location && <ErrorText>{errors.location}</ErrorText>}
+          </Step>
+        );
+      case 5:
+        return (
+          <Step title="Your Education">
+            <input
+              key="education-input"
+              className={inputClass}
+              value={education}
+              onChange={(e) => setEducation(e.target.value)}
+            />
+            {errors.education && <ErrorText>{errors.education}</ErrorText>}
+          </Step>
+        );
+      case 6:
+        return (
+          <Step title="Which roles are you aiming for?">
+            <div ref={roleWrapperRef} className="relative">
+              <input
+                key="roles-input"
+                type="search"
+                className={inputClass}
+                value={searchRole}
+                onChange={(e) => setSearchRole(e.target.value)}
+                onFocus={() => setShowRoleSuggestions(true)}
+              />
+              {showRoleSuggestions && filteredRoles.length > 0 && (
+                <ul className="absolute z-10 w-full bg-linkedin-bg border border-linkedin-border rounded mt-1 shadow max-h-40 overflow-y-auto">
+                  {filteredRoles.map((role, idx) => (
+                    <li
+                      key={idx}
+                      className="px-4 py-2 text-linkedin-text hover:bg-linkedin-hover-blue cursor-pointer"
+                      onClick={() => handleSelectRole(role)}
+                    >
+                      {role}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            {errors.selectedRoles && (
+              <ErrorText>{errors.selectedRoles}</ErrorText>
+            )}
+            <div className="flex flex-wrap gap-2 mt-3">
+              {selectedRoles.map((role, index) => (
+                <span
+                  key={index}
+                  className="flex items-center gap-2 bg-gray-700 px-3 py-1 rounded-full text-sm"
+                >
+                  {role}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveRole(role)}
+                    className="text-red-400"
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          </Step>
+        );
+      case 7:
+        return (
+          <Step title="Target Company">
+            <input
+              key="target-company-input"
+              className={inputClass}
+              value={targetCompany}
+              onChange={(e) => setTargetCompany(e.target.value)}
+            />
+            {errors.targetCompany && (
+              <ErrorText>{errors.targetCompany}</ErrorText>
+            )}
+          </Step>
+        );
+      case 8:
+        return (
+          <Step title="Upload your resume">
+            <input
+              key="resume-input"
+              type="file"
+              className={inputClass}
+              onChange={(e) => setResume(e.target.files[0])}
+            />
+            {errors.resume && <ErrorText>{errors.resume}</ErrorText>}
+          </Step>
+        );
+      case 9:
+        return (
+          <Step title="GitHub Profile URL">
+            <input
+              key="github-input"
+              type="url"
+              className={inputClass}
+              value={gitUrl}
+              onChange={(e) => setGitURL(e.target.value)}
+            />
+            {errors.gitUrl && <ErrorText>{errors.gitUrl}</ErrorText>}
+          </Step>
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-linkedin-card px-4">
@@ -301,181 +489,16 @@ export default function LinkedInForm() {
         onSubmit={handleSubmit}
         className="w-full max-w-md bg-linkedin-bg border border-linkedin-border text-linkedin-text shadow-md rounded-xl p-6"
       >
-        <AnimatePresence mode="wait">
+        <div className="relative">
           <motion.div
-            key={step}
-            initial={{ x: 100, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -100, opacity: 0 }}
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50 }}
             transition={{ duration: 0.3 }}
           >
-            {step === 1 && (
-              <Step title="What's your full name?">
-                <input
-                  className={inputClass}
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-                {errors.name && <ErrorText>{errors.name}</ErrorText>}
-              </Step>
-            )}
-            {step === 2 && (
-              <Step title="What's your experience?">
-                <input
-                  className={inputClass}
-                  value={experiences}
-                  onChange={(e) => setExperiences(e.target.value)}
-                />
-                {errors.experiences && (
-                  <ErrorText>{errors.experiences}</ErrorText>
-                )}
-              </Step>
-            )}
-            {step === 3 && (
-              <Step title="Select your skills">
-                <div ref={skillWrapperRef} className="relative">
-                  <input
-                    type="search"
-                    className={inputClass}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    onFocus={() => setShowSuggestions(true)}
-                  />
-                  {showSuggestions && filteredSkills.length > 0 && (
-                    <ul className="absolute z-10 w-full bg-linkedin-bg border border-linkedin-border rounded mt-1 shadow max-h-40 overflow-y-auto">
-                      {filteredSkills.map((skill, idx) => (
-                        <li
-                          key={idx}
-                          className="px-4 py-2 text-linkedin-text hover:bg-linkedin-hover-blue cursor-pointer"
-                          onClick={() => handleSelect(skill)}
-                        >
-                          {skill}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-                {errors.skills && <ErrorText>{errors.skills}</ErrorText>}
-                <div className="flex flex-wrap gap-2 mt-3">
-                  {selectedSkills.map((skill, index) => (
-                    <span
-                      key={index}
-                      className="flex items-center gap-2 bg-gray-700 px-3 py-1 rounded-full text-sm"
-                    >
-                      {skill}
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveSkill(skill)}
-                        className="text-red-400"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              </Step>
-            )}
-            {step === 4 && (
-              <Step title="Where are you located?">
-                <input
-                  className={inputClass}
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                />
-                {errors.location && <ErrorText>{errors.location}</ErrorText>}
-              </Step>
-            )}
-            {step === 5 && (
-              <Step title="Your Education">
-                <input
-                  className={inputClass}
-                  value={education}
-                  onChange={(e) => setEducation(e.target.value)}
-                />
-                {errors.education && <ErrorText>{errors.education}</ErrorText>}
-              </Step>
-            )}
-            {step === 6 && (
-              <Step title="Which roles are you aiming for?">
-                <div ref={roleWrapperRef} className="relative">
-                  <input
-                    type="search"
-                    className={inputClass}
-                    value={searchRole}
-                    onChange={(e) => setSearchRole(e.target.value)}
-                    onFocus={() => setShowRoleSuggestions(true)}
-                  />
-                  {showRoleSuggestions && filteredRoles.length > 0 && (
-                    <ul className="absolute z-10 w-full bg-linkedin-bg border border-linkedin-border rounded mt-1 shadow max-h-40 overflow-y-auto">
-                      {filteredRoles.map((role, idx) => (
-                        <li
-                          key={idx}
-                          className="px-4 py-2 text-linkedin-text hover:bg-linkedin-hover-blue cursor-pointer"
-                          onClick={() => handleSelectRole(role)}
-                        >
-                          {role}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-                {errors.selectedRoles && (
-                  <ErrorText>{errors.selectedRoles}</ErrorText>
-                )}
-                <div className="flex flex-wrap gap-2 mt-3">
-                  {selectedRoles.map((role, index) => (
-                    <span
-                      key={index}
-                      className="flex items-center gap-2 bg-gray-700 px-3 py-1 rounded-full text-sm"
-                    >
-                      {role}
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveRole(role)}
-                        className="text-red-400"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              </Step>
-            )}
-            {step === 7 && (
-              <Step title="Target Company">
-                <input
-                  className={inputClass}
-                  value={targetCompany}
-                  onChange={(e) => setTargetCompany(e.target.value)}
-                />
-                {errors.targetCompany && (
-                  <ErrorText>{errors.targetCompany}</ErrorText>
-                )}
-              </Step>
-            )}
-            {step === 8 && (
-              <Step title="Upload your resume">
-                <input
-                  type="file"
-                  className={inputClass}
-                  onChange={(e) => setResume(e.target.files[0])}
-                />
-                {errors.resume && <ErrorText>{errors.resume}</ErrorText>}
-              </Step>
-            )}
-            {step === 9 && (
-              <Step title="GitHub Profile URL">
-                <input
-                  type="url"
-                  className={inputClass}
-                  value={gitUrl}
-                  onChange={(e) => setGitURL(e.target.value)}
-                />
-                {errors.gitUrl && <ErrorText>{errors.gitUrl}</ErrorText>}
-              </Step>
-            )}
+            <div key={`step-${step}`}>{renderStep()}</div>
           </motion.div>
-        </AnimatePresence>
+        </div>
         <div className="flex justify-between items-center mt-6">
           {step > 1 && (
             <button
