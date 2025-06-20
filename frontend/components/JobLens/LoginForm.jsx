@@ -171,27 +171,27 @@ export default function LinkedInForm() {
   );
 
   const handleSelect = (skill) => {
-    setSelectedSkills([...selectedSkills, skill]);
+    setSelectedSkills((prev) => [...prev, skill]);
     setSearchTerm("");
     setShowSuggestions(false);
   };
 
   const handleRemoveSkill = (skill) => {
-    setSelectedSkills(selectedSkills.filter((s) => s !== skill));
+    setSelectedSkills((prev) => prev.filter((s) => s !== skill));
   };
 
   const handleSelectRole = (role) => {
-    setSelectedRoles([...selectedRoles, role]);
+    setSelectedRoles((prev) => [...prev, role]);
     setSearchRole("");
     setShowRoleSuggestions(false);
   };
 
   const handleRemoveRole = (role) => {
-    setSelectedRoles(selectedRoles.filter((r) => r !== role));
+    setSelectedRoles((prev) => prev.filter((r) => r !== role));
   };
 
   useEffect(() => {
-    function handleClickOutside(e) {
+    const handleClickOutside = (e) => {
       if (
         skillWrapperRef.current &&
         !skillWrapperRef.current.contains(e.target)
@@ -204,7 +204,7 @@ export default function LinkedInForm() {
       ) {
         setShowRoleSuggestions(false);
       }
-    }
+    };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
@@ -237,16 +237,17 @@ export default function LinkedInForm() {
   };
 
   const handleNext = () => {
-    if (validateStep()) setStep((s) => s + 1);
+    if (validateStep()) setStep((prev) => prev + 1);
   };
 
   const handlePrev = () => {
-    setStep((s) => s - 1);
+    setStep((prev) => prev - 1);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateStep()) return;
+
     const token = localStorage.getItem("token");
     const uid = localStorage.getItem("uid");
 
@@ -259,7 +260,7 @@ export default function LinkedInForm() {
       education,
       role: selectedRoles,
       dreamCompanies: [targetCompany],
-      resumeUrl: "ihtisrhfkih",
+      resumeUrl: "resume-placeholder",
       githubURL: gitUrl,
     };
 
@@ -455,9 +456,9 @@ export default function LinkedInForm() {
             {step === 8 && (
               <Step title="Upload your resume">
                 <input
-                  type="text"
+                  type="file"
                   className={inputClass}
-                  onChange={(e) => setResume(e.target.value)}
+                  onChange={(e) => setResume(e.target.files[0])}
                 />
                 {errors.resume && <ErrorText>{errors.resume}</ErrorText>}
               </Step>
