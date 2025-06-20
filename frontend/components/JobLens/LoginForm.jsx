@@ -254,7 +254,7 @@ export default function LinkedInForm() {
       education,
       role: selectedRoles,
       dreamCompanies: [targetCompany],
-      resumeUrl: "ihtisrhfkih",
+      resumeUrl: "A",
       githubURL: gitUrl,
     };
 
@@ -297,10 +297,10 @@ export default function LinkedInForm() {
       >
         <AnimatePresence mode="wait">
           <motion.div
-            layout
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            key={step}
+            initial={{ x: 100, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -100, opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
             {step === 1 && (
@@ -493,7 +493,7 @@ export default function LinkedInForm() {
             <button
               type="submit"
               className="bg-green-600 text-white px-4 py-2 rounded"
-              onClick={karDiyaSubmit}
+                
             >
               Submit
             </button>
